@@ -1,111 +1,1229 @@
+/* ──────────────────────────────────────────────────────────────────────
+   Paleta. La flor es la unica fuente de luz de la escena: todo lo demas
+   es oscuro y calido, y por eso el amarillo funciona.
+   ────────────────────────────────────────────────────────────────────── */
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+  --night-deep: #1e2620;
+  --night-mid: #2f3a2e;
+  --glow-warm: #6b5a2e;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --petal-tip: #ffe066;
+  --petal-mid: #ffc93c;
+  --petal-base: #d97a0f;
+  --petal-tension: #ffd873;
+  --petal-fallen: #e8a93a;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
+  --disc-dark: #3a2412;
+  --disc-seed: #c08b3e;
+
+  --leaf: #5c7a4a;
+  --leaf-shadow: #36492c;
+  --leaf-vein: #7e9668;
+
+  --paper: #f7efdf;
+  --paper-edge: #e3d4b4;
+  --linen: #6e7a5c;
+  --foil: #c9a227;
+  --ink: #3b3128;
+
+  --serif: 'Fraunces', 'Fraunces fallback', Georgia, serif;
+  --hand: 'Caveat', 'Segoe Script', cursive;
+
+  --t-13: 13px;
+  --t-16: 16px;
+  --t-20: 20px;
+  --t-25: 25px;
+  --t-31: 31px;
+  --t-39: 39px;
+  --t-49: 49px;
+
+  color-scheme: dark;
+}
+
+/* Metricas ajustadas: el titulo no salta al cargar Fraunces. */
+@font-face {
+  font-family: 'Fraunces fallback';
+  src: local('Georgia'), local('Times New Roman');
+  size-adjust: 103%;
+  ascent-override: 92%;
+  descent-override: 24%;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+body {
+  min-height: 100dvh;
+  background: var(--night-deep);
+  color: var(--paper);
+  font-family: var(--serif);
+  font-optical-sizing: auto;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
+  overflow: hidden;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+/* Safari iOS: 100dvh no existe en versiones antiguas. */
+@supports not (height: 100dvh) {
+  body {
+    min-height: 100vh;
   }
 }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
+  height: 100dvh;
+  isolation: isolate;
+}
+
+:focus-visible {
+  outline: 2px solid var(--foil);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   Escenario y pila de capas. El canvas se pinta ENCIMA del album pero
+   escucha los eventos desde el contenedor que esta debajo (eventSource),
+   que es lo que permite que una hoja cruce por delante del libro sin
+   dejarlo sin pulsar.
+   ────────────────────────────────────────────────────────────────────── */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.flower-canvas {
+  position: fixed !important;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  touch-action: none;
+}
+
+[data-album-surface] {
+  /* El swipe del album lo gestiona JS; el paneo vertical se deja al sistema. */
+  touch-action: pan-y;
+}
+
+/* Cursores por objetivo, conmutados desde JS sobre .stage */
+.stage[data-hover='ligule'] {
+  cursor: grab;
+}
+.stage[data-pulling='true'] {
+  cursor: grabbing;
+}
+.stage[data-hover='leaf'],
+.stage[data-hover='disc'] {
+  cursor: pointer;
+}
+
+/* ── Fondo: tres capas CSS, cero coste de GPU ──────────────────────── */
+
+.bg-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.bg-radial {
+  background:
+    radial-gradient(
+      62% 58% at 25% 44%,
+      color-mix(in srgb, var(--glow-warm) 42%, transparent) 0%,
+      transparent 68%
+    ),
+    radial-gradient(120% 100% at 50% 50%, var(--night-mid) 0%, var(--night-deep) 72%);
+}
+
+.bg-grain {
+  opacity: 0.045;
+  mix-blend-mode: overlay;
+}
+
+.bg-vignette {
+  box-shadow: inset 0 0 22vmax 6vmax rgba(10, 14, 11, 0.72);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   Titulo. Centrado sobre la columna de la flor (25 % del ancho), no sobre
+   la pantalla: sobre la pantalla flotaria en el corredor vacio.
+   ────────────────────────────────────────────────────────────────────── */
+
+.header-overlay {
+  position: absolute;
+  z-index: 20;
+  top: clamp(56px, 9vh, 104px);
+  left: 25%;
+  transform: translateX(-50%);
+  width: min(42ch, 44vw);
   text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
+  pointer-events: none;
+}
+
+.header-overlay h1 {
+  margin: 0;
+  font-size: var(--t-39);
+  font-weight: 400;
+  font-variation-settings: 'opsz' 120, 'SOFT' 60, 'WONK' 1;
+  line-height: 1.12;
+  letter-spacing: 0.002em;
+  color: var(--paper);
+  text-shadow: 0 2px 18px rgba(10, 14, 11, 0.55);
+}
+
+.header-overlay p {
+  margin: 10px 0 0;
+  font-size: var(--t-16);
+  font-weight: 300;
+  font-variation-settings: 'opsz' 24, 'SOFT' 30, 'WONK' 0;
+  opacity: 0.55;
+}
+
+/* ── Susurro de la flor ────────────────────────────────────────────── */
+
+.flower-whisper {
+  position: absolute;
+  z-index: 40;
+  left: 25%;
+  bottom: clamp(48px, 12vh, 132px);
+  transform: translateX(-50%);
+  pointer-events: none;
+  font-family: var(--hand);
+  font-weight: 500;
+  font-size: var(--t-25);
+  color: #f0e6d2;
+  text-shadow: 0 2px 14px rgba(10, 14, 11, 0.7);
+  white-space: nowrap;
+}
+
+.flower-whisper--hint {
+  font-size: var(--t-20);
+  opacity: 0.72;
+}
+
+/* ── Interruptores de audio ────────────────────────────────────────── */
+
+.audio-toggles {
+  position: absolute;
+  z-index: 60;
+  top: max(14px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  display: flex;
+  gap: 6px;
+}
+
+.audio-toggles button {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(247, 239, 223, 0.16);
+  border-radius: 50%;
+  background: rgba(30, 38, 32, 0.5);
+  color: var(--paper);
+  font-family: var(--serif);
+  font-size: var(--t-13);
+  font-variation-settings: 'opsz' 14, 'SOFT' 0, 'WONK' 0;
+  cursor: pointer;
+  opacity: 0.55;
+  transition:
+    opacity 180ms ease,
+    border-color 180ms ease;
+}
+
+.audio-toggles button[aria-pressed='true'] {
+  opacity: 1;
+  border-color: rgba(201, 162, 39, 0.55);
+}
+
+.audio-toggles button:hover {
+  opacity: 0.9;
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   Espejo DOM del girasol. En cuanto los petalos y las hojas son
+   manipulables, la flor deja de ser decorativa y pasa a ser un control.
+   Oculto con clip-path, NO con display:none, para que siga en el orden
+   de foco y el anillo aparezca sobre la parte de la flor que toca.
+   ────────────────────────────────────────────────────────────────────── */
+
+.a11y-mirror {
+  position: absolute;
+  z-index: 60;
+  inset: 0;
+  pointer-events: none;
+}
+
+.a11y-mirror button {
+  position: absolute;
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  pointer-events: auto;
+}
+
+.a11y-mirror button:focus-visible {
+  clip-path: none;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  padding: 6px 10px;
+  background: rgba(30, 38, 32, 0.92);
+  color: var(--paper);
+  font: 500 13px/1 var(--serif);
+  border-radius: 6px;
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   El album cerrado: un libro real apoyado sobre una superficie insinuada,
+   centrado en la columna derecha.
+   ────────────────────────────────────────────────────────────────────── */
+
+.album-panel {
+  position: absolute;
+  z-index: 30;
+  opacity: 0;
+  animation: chrome-in 500ms ease-out 1950ms forwards;
+  left: 62%;
+  top: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
+  align-items: center;
+  gap: 14px;
 }
 
-body {
-  margin: 0;
+.album-panel__button {
+  --w: 280px;
+  --h: 360px;
+  position: relative;
+  width: var(--w);
+  height: var(--h);
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  perspective: 1400px;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+.album-cover {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 4px 10px 10px 4px;
+  background: var(--linen);
+  transform: rotateY(-9deg) rotateX(4deg);
+  transform-style: preserve-3d;
+  box-shadow:
+    0 18px 38px -14px rgba(8, 12, 9, 0.85),
+    0 44px 80px -30px rgba(8, 12, 9, 0.6);
+  /* Respiracion: es lo que dice «esto se puede pulsar». */
+  animation: album-breathe 4.2s ease-in-out infinite;
+  transition:
+    filter 240ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    box-shadow 240ms ease;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
+@keyframes album-breathe {
+  0%,
+  100% {
+    scale: 1;
+  }
+  50% {
+    scale: 1.012;
   }
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
+
+.album-cover__linen {
+  display: block;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0.04;
+  pointer-events: none;
 }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
+.album-cover__title {
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 42%;
+  text-align: center;
+  font-size: var(--t-20);
+  font-variation-settings: 'opsz' 32, 'SOFT' 40, 'WONK' 0;
+  color: var(--foil);
+  text-shadow:
+    0 1px 0 rgba(255, 245, 210, 0.35),
+    0 -1px 0 rgba(60, 45, 8, 0.5);
+}
+
+/* Canto de paginas: nueve franjas, deliberadamente no equiespaciadas. */
+.album-cover__edges {
+  display: block;
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  right: -7px;
+  width: 7px;
+  border-radius: 0 3px 3px 0;
+  background: var(--paper-edge);
+  overflow: hidden;
+}
+
+.album-cover__edges span {
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1.5px;
+  background: rgba(59, 49, 40, 0.28);
+}
+
+.album-cover__ribbon {
+  display: block;
+  position: absolute;
+  left: 22%;
+  top: 60%;
+  width: 14px;
+  height: 90px;
+  background: linear-gradient(var(--foil), #8e6f19);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 82%, 0 100%);
+  transform-origin: top center;
+  animation: ribbon-sway 5.5s ease-in-out infinite;
+  opacity: 0.85;
+}
+
+@keyframes ribbon-sway {
+  0%,
+  100% {
+    transform: rotate(-2.2deg);
+  }
+  50% {
+    transform: rotate(2.6deg);
+  }
+}
+
+/* La tapa se abre 10 grados y la primera foto asoma. */
+.album-cover__peek {
+  display: block;
+  position: absolute;
+  right: 4px;
+  top: 18px;
+  bottom: 18px;
+  width: 42%;
+  border-radius: 0 3px 3px 0;
+  background: var(--paper);
+  /* En un contexto preserve-3d manda la Z, no el z-index: la primera foto
+     asoma por DETRAS de la tapa, que es de donde saldria en un libro. */
+  transform: translate3d(0, 0, -6px);
+  opacity: 0;
+  transition:
+    transform 240ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity 240ms ease;
+}
+
+.album-panel__button:hover .album-cover,
+.album-panel__button:focus-visible .album-cover {
+  filter: brightness(1.06);
+  box-shadow:
+    0 18px 38px -14px rgba(8, 12, 9, 0.85),
+    0 44px 80px -30px rgba(8, 12, 9, 0.6),
+    0 0 46px -6px rgba(201, 162, 39, 0.35);
+}
+
+.album-panel__button:hover .album-cover__peek,
+.album-panel__button:focus-visible .album-cover__peek {
+  transform: translate3d(8px, 0, -6px);
+  opacity: 1;
+}
+
+.album-panel__count {
+  font-size: var(--t-13);
+  font-variation-settings: 'opsz' 14, 'SOFT' 0, 'WONK' 0;
+  opacity: 0.5;
+  letter-spacing: 0.04em;
+}
+
+.album-panel__cta {
+  position: absolute;
+  bottom: -30px;
+  font-size: var(--t-13);
+  font-variation-settings: 'opsz' 14;
+  color: var(--paper);
+  opacity: 0;
+  transition: opacity 240ms ease;
+  white-space: nowrap;
+}
+
+.album-panel__button:hover ~ .album-panel__cta,
+.album-panel__button:focus-visible ~ .album-panel__cta {
+  opacity: 0.8;
+}
+
+/* Degradado lateral: separa sin ocultar. Nada de backdrop-filter. */
+.album-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    transparent 46%,
+    rgba(20, 26, 20, 0.4) 72%,
+    rgba(20, 26, 20, 0.4) 100%
+  );
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.album-scrim[data-on='true'] {
+  opacity: 1;
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   El album abierto.
+
+   REGLA QUE NO SE PUEDE ROMPER: `transform-style: preserve-3d` se degrada
+   a `flat` si un ancestro tiene overflow != visible, opacity < 1, filter,
+   backdrop-filter, clip-path, mask, mix-blend-mode != normal, isolation,
+   contain: paint, o will-change nombrando alguna de ellas.
+
+   Por eso el marco se redondea con BACKGROUND y no con overflow, y por eso
+   quien se desvanece es `.album-proxy`, un div plano hermano, mientras
+   `.album-stage` permanece a opacity: 1 de principio a fin.
+   ────────────────────────────────────────────────────────────────────── */
+
+.album-anchor {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  pointer-events: none;
+}
+
+.album-frame {
+  position: absolute;
+  /* Centrado estatico: solo se animan width y height, nunca este transform. */
+  left: 62%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 10px;
+  background: var(--linen);
+  box-shadow:
+    0 24px 60px -18px rgba(8, 12, 9, 0.9),
+    0 60px 120px -40px rgba(8, 12, 9, 0.65);
+  pointer-events: auto;
+  transition:
+    width 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.album-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 14px;
+  perspective: 2200px;
+  overflow: visible;
+  opacity: 1;
+}
+
+.album-proxy {
+  position: absolute;
+  left: 62%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 10px;
+  background: var(--linen);
+  pointer-events: none;
+  transition: opacity 120ms ease-out;
+}
+
+.album-proxy[data-fading='true'] {
+  opacity: 0;
+}
+
+.album-book {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 48px 1fr;
+  background: var(--paper);
   border-radius: 4px;
-  color: var(--text-h);
+  box-shadow: inset 0 0 40px -10px rgba(59, 49, 40, 0.3);
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.album-book[data-single='true'] {
+  grid-template-columns: 1fr;
+}
+
+.album-gutter {
+  background: linear-gradient(
+    to right,
+    rgba(59, 49, 40, 0.02),
+    rgba(59, 49, 40, 0.22) 45%,
+    rgba(59, 49, 40, 0.22) 55%,
+    rgba(59, 49, 40, 0.02)
+  );
+}
+
+.album-page {
+  position: relative;
+  overflow: hidden;
+  background: var(--paper);
+}
+
+/* Fibra del papel y canto irregular. */
+.album-page::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    91deg,
+    rgba(59, 49, 40, 0.025) 0 1px,
+    transparent 1px 3px
+  );
+}
+
+/* ── La hoja que gira ──────────────────────────────────────────────── */
+
+.album-leaf {
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 50%;
+  width: calc(50% - 38px);
+  z-index: 50;
+  transform-style: preserve-3d;
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+.album-leaf[data-dir='-1'] {
+  left: 14px;
+  transform-origin: right center;
+}
+
+.album-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  background: var(--paper);
+  box-shadow: 0 0 18px -4px rgba(59, 49, 40, 0.45);
+}
+
+.album-face--back {
+  transform: rotateY(180deg);
+}
+
+/* Ventana de media plana: el pliego se pinta entero y se recorta. */
+.album-face__window {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 200%;
+  display: grid;
+  grid-template-columns: 1fr 48px 1fr;
+}
+
+.album-face__window[data-half='right'] {
+  left: calc(-100% - 48px);
+}
+
+/* Sombra dinamica del giro, gobernada por --flip-progress (0 → 1). */
+.album-leaf::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(
+    to right,
+    rgba(40, 32, 22, calc(0.34 * var(--flip-shadow, 0))),
+    transparent 62%
+  );
+}
+
+/* ── Navegacion ────────────────────────────────────────────────────── */
+
+.album-nav {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 56px;
+  min-width: 44px;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  cursor: pointer;
+  opacity: 0.32;
+  transition: opacity 180ms ease;
+  font-size: var(--t-25);
+  z-index: 60;
+}
+
+.album-nav:hover:not(:disabled) {
+  opacity: 0.8;
+}
+
+.album-nav:disabled {
+  opacity: 0.08;
+  cursor: default;
+}
+
+.album-nav--prev {
+  left: 0;
+}
+.album-nav--next {
+  right: 0;
+}
+
+.album-indicator {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -28px;
+  text-align: center;
+  font-size: var(--t-13);
+  font-variation-settings: 'opsz' 14;
+  color: var(--paper);
+  opacity: 0.55;
+}
+
+.album-close {
+  position: absolute;
+  top: -40px;
+  right: 0;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid rgba(247, 239, 223, 0.18);
+  border-radius: 999px;
+  background: rgba(30, 38, 32, 0.55);
+  color: var(--paper);
+  font-family: var(--serif);
+  font-size: var(--t-13);
+  font-variation-settings: 'opsz' 14;
+  cursor: pointer;
+}
+
+/* ── Maquetas de pliego ────────────────────────────────────────────── */
+
+.spread-pad {
+  position: absolute;
+  inset: 0;
+  padding: clamp(18px, 3.2%, 38px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: var(--ink);
+}
+
+.spread-title {
+  margin: 0;
+  font-size: var(--t-20);
+  font-weight: 500;
+  font-variation-settings: 'opsz' 32, 'SOFT' 40, 'WONK' 0;
+  color: var(--ink);
+}
+
+.spread-text {
+  margin: 0;
+  font-family: var(--hand);
+  font-weight: 500;
+  font-size: var(--t-25);
+  line-height: 1.34;
+  color: var(--ink);
+}
+
+.spread-signature {
+  margin-top: auto;
+  align-self: flex-end;
+  font-family: var(--hand);
+  font-size: var(--t-25);
+  color: #6b5a2e;
+}
+
+.spread-duo {
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+
+.spread-hero {
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+
+.spread-collage {
+  position: relative;
+  height: 100%;
+}
+
+.spread-collage .polaroid {
+  position: absolute;
+}
+
+.spread-collage .polaroid:nth-child(1) {
+  left: 4%;
+  top: 6%;
+  width: 58%;
+}
+.spread-collage .polaroid:nth-child(2) {
+  right: 6%;
+  top: 34%;
+  width: 46%;
+}
+.spread-collage .polaroid:nth-child(3) {
+  left: 16%;
+  bottom: 4%;
+  width: 52%;
+}
+
+.spread-note {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 18px;
+  height: 100%;
+}
+
+.spread-closing {
+  display: grid;
+  place-items: center;
+  gap: 16px;
+  height: 100%;
+  text-align: center;
+}
+
+/* ── Polaroid ──────────────────────────────────────────────────────── */
+
+.polaroid {
+  position: relative;
+  padding: 10px 10px 34px;
+  background: #fffdf7;
+  border-radius: 2px;
+  box-shadow:
+    0 6px 14px -6px rgba(40, 32, 22, 0.45),
+    0 16px 34px -18px rgba(40, 32, 22, 0.4);
+  max-width: 100%;
+}
+
+.polaroid__frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--fallback, #8c7a64);
+}
+
+.polaroid__frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+
+.polaroid__frame img[data-ready='true'] {
+  opacity: 1;
+}
+
+.polaroid__caption {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 8px;
+  font-family: var(--hand);
+  font-size: var(--t-20);
+  color: var(--ink);
+  text-align: center;
+}
+
+.polaroid__date {
+  position: absolute;
+  right: 12px;
+  top: 14px;
+  font-size: 11px;
+  font-variation-settings: 'opsz' 14;
+  color: rgba(59, 49, 40, 0.5);
+}
+
+.accent {
+  position: absolute;
+  pointer-events: none;
+}
+
+.accent--washi {
+  left: 50%;
+  top: -12px;
+  width: 78px;
+  height: 26px;
+  translate: -50% 0;
+  rotate: -3deg;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(201, 162, 39, 0.45) 0 6px,
+    rgba(247, 239, 223, 0.55) 6px 12px
+  );
+}
+
+.accent--clip {
+  left: -8px;
+  top: 10px;
+  width: 22px;
+  height: 46px;
+}
+
+.accent--stamp {
+  right: -6px;
+  top: -8px;
+  width: 42px;
+  height: 46px;
+}
+
+/* La ligula prensada: el mismo perfil del girasol, desaturado y con pliegue.
+   Cierra el circulo entre las dos mitades de la pantalla. */
+.accent--petal {
+  right: -14px;
+  bottom: 18px;
+  width: 30px;
+  height: 64px;
+  rotate: 16deg;
+}
+
+/* ── Poster estatico: sin WebGL se pierde fidelidad, no experiencia ── */
+
+.static-poster {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  pointer-events: none;
+}
+
+.static-poster svg {
+  position: absolute;
+  left: 25%;
+  top: 50%;
+  translate: -50% -50%;
+  width: min(46vw, 62vh);
+  overflow: visible;
+  pointer-events: auto;
+}
+
+.static-poster .sp-ligule {
+  cursor: grab;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition:
+    transform 420ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity 420ms ease;
+}
+
+.static-poster .sp-ligule[data-gone='true'] {
+  transform: translateY(26px) rotate(14deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── Breakpoints ───────────────────────────────────────────────────── */
+
+@media (max-width: 1099px) and (min-width: 900px) {
+  .album-panel {
+    left: 60%;
+  }
+  .album-panel__button {
+    --w: 240px;
+    --h: 310px;
+  }
+  .album-frame,
+  .album-proxy {
+    left: 60%;
+  }
+  .header-overlay {
+    left: 24%;
+    width: min(38ch, 46vw);
+  }
+  .flower-whisper {
+    left: 24%;
+  }
+}
+
+/* Apilado: la flor arriba, el album como banda inferior con el lomo a la vista. */
+@media (max-width: 899px) {
+  .header-overlay {
+    left: 50%;
+    /* Despeja los interruptores de audio, que son de 44 px. */
+    top: calc(64px + env(safe-area-inset-top));
+    width: min(34ch, 88vw);
+  }
+  .header-overlay h1 {
+    font-size: var(--t-31);
+  }
+
+  .flower-whisper {
+    left: 50%;
+    bottom: 168px;
+  }
+
+  .album-panel {
+    left: 50%;
+    top: auto;
+    bottom: max(14px, env(safe-area-inset-bottom));
+    transform: translateX(-50%);
+    flex-direction: row;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .album-panel__button {
+    --w: 220px;
+    --h: 132px;
+  }
+
+  .album-cover {
+    transform: rotateX(8deg);
+    border-radius: 4px 8px 8px 4px;
+  }
+
+  .album-cover__title {
+    top: 38%;
+  }
+
+  .album-cover__ribbon {
+    display: none;
+  }
+
+  .album-panel__cta {
+    display: none;
+  }
+
+  .album-frame,
+  .album-proxy {
+    left: 50%;
+  }
+
+  .album-scrim {
+    background: linear-gradient(
+      to bottom,
+      transparent 18%,
+      rgba(20, 26, 20, 0.45) 52%
+    );
+  }
+
+  .album-book {
+    grid-template-columns: 1fr;
+  }
+
+  .album-leaf {
+    left: 14px;
+    width: calc(100% - 28px);
+  }
+}
+
+@media (max-width: 599px) {
+  :root {
+    --t-39: 31px;
+    --t-31: 25px;
+  }
+
+  .album-panel__button {
+    --w: min(86vw, 300px);
+    --h: 120px;
+  }
+
+  .album-close {
+    top: -38px;
+  }
+}
+
+/* ── prefers-reduced-motion ────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .album-panel {
+    animation-delay: 0ms;
+    animation-duration: 200ms;
+  }
+
+  .album-cover {
+    animation: none;
+  }
+
+  .album-cover__ribbon {
+    animation: none;
+  }
+
+  .album-frame {
+    transition-duration: 200ms;
+  }
+
+  .album-leaf {
+    transition: none;
+  }
+
+  .polaroid__frame img {
+    transition-duration: 180ms;
+  }
+}
+
+/* ── Coreografia de entrada del cromo ──────────────────────────────── */
+
+@keyframes chrome-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* El susurro sube 14 px y se desvanece en 2.6 s. */
+@keyframes whisper-rise {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, 8px);
+  }
+  14% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  72% {
+    opacity: 1;
+    transform: translate(-50%, -8px);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -14px);
+  }
+}
+
+.flower-whisper {
+  opacity: 0;
+  animation: whisper-rise 2600ms ease-out forwards;
+}
+
+.flower-whisper--hint {
+  animation-duration: 3000ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flower-whisper {
+    animation-name: chrome-in;
+    animation-duration: 300ms;
+    transform: translateX(-50%);
+  }
+}
+
+/* Una pagina: las dos mitades del pliego se apilan en vez de solaparse. */
+.album-page[data-single='true'] {
+  display: flex;
+  flex-direction: column;
+}
+
+.album-page[data-single='true'] .spread-pad {
+  position: relative;
+  inset: auto;
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 16px 18px;
+}
+
+.album-page[data-single='true'] .spread-collage {
+  min-height: 150px;
+}
+
+.polaroid--small {
+  max-width: 46%;
+  align-self: flex-start;
+}
+
+/* La tapa que gira al abrir: vive dentro de album-stage, que nunca recorta
+   ni se desvanece, asi que el preserve-3d de las paginas sigue intacto. */
+.album-cover-leaf {
+  position: absolute;
+  top: 14px;
+  bottom: 14px;
+  left: 50%;
+  right: 14px;
+  z-index: 70;
+  border-radius: 4px 10px 10px 4px;
+  background: var(--linen);
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  box-shadow: 0 10px 30px -12px rgba(8, 12, 9, 0.8);
+  pointer-events: none;
+}
+
+.album-book[data-single='true'] ~ .album-cover-leaf,
+.album-cover-leaf[data-single='true'] {
+  left: 14px;
+}
+
+.album-cover-leaf .album-cover__title {
+  top: 44%;
+}
+
+@media (max-width: 899px) {
+  /* El album ocupa casi todo el alto: el boton de cerrar vive dentro. */
+  .album-close {
+    top: 8px;
+    right: 8px;
+    z-index: 90;
+    background: rgba(30, 38, 32, 0.78);
+  }
+
+  /* Una sola pagina: la foto cede sitio para que el texto entre entero. */
+  .album-page[data-single='true'] .polaroid {
+    max-width: 66%;
+    margin-inline: auto;
+  }
+
+  .album-page[data-single='true'] .spread-text {
+    font-size: var(--t-20);
+  }
+
+  .album-page[data-single='true'] .spread-collage .polaroid {
+    max-width: 44%;
+  }
 }

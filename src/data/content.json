@@ -1,0 +1,191 @@
+{
+  "hero": {
+    "title": "Para ti, en este día",
+    "subtitle": "veintiuno de septiembre"
+  },
+  "flower": {
+    "petalMode": "oracle",
+    "oracle": {
+      "enabled": true,
+      "phrases": [
+        "me quiere",
+        "no me quiere"
+      ],
+      "final": "me quiere, siempre"
+    },
+    "petalMemories": [
+      "la primera vez que te reíste así",
+      "aquel café que se enfrió entero",
+      "el camino largo, a propósito",
+      "cuando llovió y no nos movimos",
+      "tu letra en el margen",
+      "la canción que ya es nuestra",
+      "el día que no hizo falta hablar",
+      "la foto que salió movida",
+      "septiembre, otra vez",
+      "tu mano buscando la mía",
+      "el silencio cómodo",
+      "aquella ventana",
+      "cuando dijiste que sí",
+      "el mapa que no seguimos",
+      "tu abrigo prestado",
+      "la cena quemada",
+      "el último tren",
+      "la playa en invierno",
+      "cuando te quedaste dormida",
+      "el chiste que solo entendemos",
+      "hoy"
+    ],
+    "discWhispers": [
+      "sigo aquí",
+      "girando hacia ti",
+      "buenos días",
+      "no te vayas todavía",
+      "te estaba esperando"
+    ],
+    "hint": "tira de un pétalo",
+    "rebloomIdleMs": 22000
+  },
+  "album": {
+    "coverTitle": "Nosotros",
+    "countLabel": "Nueve recuerdos",
+    "openLabel": "Abrir el álbum",
+    "closeLabel": "Cerrar el álbum",
+    "indicatorLabel": "Recuerdo",
+    "photos": [
+      {
+        "id": "memory-1",
+        "src": "/assets/photos/memory-1.jpg",
+        "alt": "Los dos, muy cerca, en una tarde de luz baja.",
+        "caption": "el principio",
+        "date": "marzo",
+        "rotation": -2.1,
+        "accent": "washi",
+        "dominantColor": "#D6C39F"
+      },
+      {
+        "id": "memory-2",
+        "src": "/assets/photos/memory-2.jpg",
+        "alt": "Una mesa con dos tazas y las manos alrededor.",
+        "caption": "y el café se enfrió",
+        "rotation": 1.6,
+        "accent": "clip",
+        "dominantColor": "#C19B6C"
+      },
+      {
+        "id": "memory-3",
+        "src": "/assets/photos/memory-3.jpg",
+        "alt": "Retrato a contraluz, sonriendo.",
+        "caption": "esta es mi favorita",
+        "date": "junio",
+        "rotation": -1.2,
+        "accent": "petal",
+        "dominantColor": "#AE834F"
+      },
+      {
+        "id": "memory-4",
+        "src": "/assets/photos/memory-4.jpg",
+        "alt": "Un camino entre árboles, al atardecer.",
+        "rotation": 2.4,
+        "accent": "washi",
+        "dominantColor": "#937052"
+      },
+      {
+        "id": "memory-5",
+        "src": "/assets/photos/memory-5.jpg",
+        "alt": "Detalle de dos manos entrelazadas.",
+        "rotation": -2.8,
+        "accent": "clip",
+        "dominantColor": "#C5AF83"
+      },
+      {
+        "id": "memory-6",
+        "src": "/assets/photos/memory-6.jpg",
+        "alt": "Una ventana con la ciudad al fondo.",
+        "caption": "desde aquella ventana",
+        "rotation": 1.1,
+        "accent": "stamp",
+        "dominantColor": "#AFAD6A"
+      },
+      {
+        "id": "pic1",
+        "src": "/assets/photos/pic1.jpg",
+        "alt": "Los dos riéndonos de algo que ya no recordamos.",
+        "rotation": -1.7,
+        "accent": "washi",
+        "dominantColor": "#8F662F"
+      },
+      {
+        "id": "pic2",
+        "src": "/assets/photos/pic2.jpg",
+        "alt": "Un plato a medias y la sobremesa.",
+        "caption": "la cena quemada",
+        "rotation": 2.2,
+        "accent": "clip",
+        "dominantColor": "#75694C"
+      },
+      {
+        "id": "pic3",
+        "src": "/assets/photos/pic3.jpg",
+        "alt": "El horizonte, muy ancho, sin prisa.",
+        "caption": "y lo que viene",
+        "rotation": -0.9,
+        "accent": "petal",
+        "dominantColor": "#977E52"
+      }
+    ],
+    "spreads": [
+      {
+        "id": "s1",
+        "layout": "duo",
+        "photos": [
+          "memory-1",
+          "memory-2"
+        ],
+        "title": "Cómo empezó",
+        "text": "No hubo un momento exacto. Hubo una tarde, y luego otra, y para cuando quisimos darnos cuenta ya era esto."
+      },
+      {
+        "id": "s2",
+        "layout": "hero",
+        "photos": [
+          "memory-3"
+        ],
+        "title": "Tu cara",
+        "text": "Esta es la que miro cuando no estás."
+      },
+      {
+        "id": "s3",
+        "layout": "collage",
+        "photos": [
+          "memory-4",
+          "memory-5",
+          "pic1"
+        ],
+        "title": "Todo lo demás",
+        "text": "Los caminos largos, las manos, la risa. Lo que no cabe en una sola foto."
+      },
+      {
+        "id": "s4",
+        "layout": "note",
+        "photos": [
+          "memory-6",
+          "pic2"
+        ],
+        "title": "Una nota",
+        "text": "Gracias por las cenas quemadas, por las ventanas, por quedarte cuando era más fácil irse. Gracias por hacer que un martes cualquiera valga la pena.",
+        "signature": "siempre tuyo"
+      },
+      {
+        "id": "s5",
+        "layout": "closing",
+        "photos": [
+          "pic3"
+        ],
+        "title": "Y lo que viene",
+        "text": "Feliz veintiuno de septiembre.",
+        "signature": "me quiere, siempre"
+      }
+    ]
+  }
+}
