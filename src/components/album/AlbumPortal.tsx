@@ -79,7 +79,7 @@ export function AlbumPortal() {
 
   const frameRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
-  const swipeStart = useRef<{ x: number; id: number } | null>(null);
+  const swipeStart = useRef<{ x: number; y: number; id: number } | null>(null);
   /** Solo se devuelve el foco si el album llego a abrirse. */
   const wasOpened = useRef(false);
 
@@ -212,15 +212,19 @@ export function AlbumPortal() {
   /* ── Swipe, con umbral de 60 px ──────────────────────────────────── */
 
   const onPointerDown = (event: React.PointerEvent) => {
-    swipeStart.current = { x: event.clientX, id: event.pointerId };
+    swipeStart.current = { x: event.clientX, y: event.clientY, id: event.pointerId };
   };
 
   const onPointerUp = (event: React.PointerEvent) => {
     const start = swipeStart.current;
     swipeStart.current = null;
     if (!start || start.id !== event.pointerId || isFlipping) return;
+
     const dx = event.clientX - start.x;
-    if (Math.abs(dx) < 60) return;
+    const dy = event.clientY - start.y;
+    // Umbral de 60 px y claramente horizontal: en movil el pliego de una
+    // pagina se recorre en vertical, y ese gesto no debe pasar pagina.
+    if (Math.abs(dx) < 60 || Math.abs(dx) <= Math.abs(dy)) return;
     if (dx < 0) goNext();
     else goPrev();
   };

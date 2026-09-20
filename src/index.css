@@ -65,6 +65,11 @@ body {
 }
 
 body {
+  /* Toda la pagina se maneja arrastrando: petalos, hojas y el swipe del
+     album. Sin esto, cualquier gesto empieza seleccionando texto. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   min-height: 100dvh;
   background: var(--night-deep);
   color: var(--paper);
@@ -87,6 +92,11 @@ body {
 #root {
   height: 100dvh;
   isolation: isolate;
+}
+
+img {
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 :focus-visible {
@@ -625,21 +635,40 @@ body {
 
 /* ── La hoja que gira ──────────────────────────────────────────────── */
 
+/* Registrada para poder interpolarla: sin @property el numero salta de 0 a 1
+   y la sombra del giro aparece de golpe. */
+@property --flip-shadow {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
 .album-leaf {
   position: absolute;
-  top: 14px;
-  bottom: 14px;
-  left: 50%;
-  width: calc(50% - 38px);
+  top: 0;
+  bottom: 0;
   z-index: 50;
   transform-style: preserve-3d;
-  transform-origin: left center;
   pointer-events: none;
 }
 
+/* El lomo es el eje: hacia delante la hoja sale de la mitad derecha y gira
+   sobre el gutter; hacia atras, espejado. */
+.album-leaf[data-dir='1'] {
+  left: calc(50% + 24px);
+  right: 0;
+  transform-origin: left center;
+}
+
 .album-leaf[data-dir='-1'] {
-  left: 14px;
+  left: 0;
+  right: calc(50% + 24px);
   transform-origin: right center;
+}
+
+.album-book[data-single='true'] .album-leaf {
+  left: 0;
+  right: 0;
 }
 
 .album-face {
@@ -655,21 +684,12 @@ body {
   transform: rotateY(180deg);
 }
 
-/* Ventana de media plana: el pliego se pinta entero y se recorta. */
-.album-face__window {
+.album-face .album-page {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 200%;
-  display: grid;
-  grid-template-columns: 1fr 48px 1fr;
+  inset: 0;
 }
 
-.album-face__window[data-half='right'] {
-  left: calc(-100% - 48px);
-}
-
-/* Sombra dinamica del giro, gobernada por --flip-progress (0 → 1). */
+/* Sombra dinamica del giro, gobernada por --flip-shadow (0 → 1). */
 .album-leaf::before {
   content: '';
   position: absolute;
@@ -1006,6 +1026,15 @@ body {
     bottom: 168px;
   }
 
+  /* En movil la frase puede caer cerca del borde: que envuelva en vez de
+     desbordar. */
+  .flower-whisper--roaming {
+    max-width: 72vw;
+    white-space: normal;
+    text-align: center;
+    line-height: 1.2;
+  }
+
   .album-panel {
     left: 50%;
     top: auto;
@@ -1055,10 +1084,6 @@ body {
     grid-template-columns: 1fr;
   }
 
-  .album-leaf {
-    left: 14px;
-    width: calc(100% - 28px);
-  }
 }
 
 @media (max-width: 599px) {
@@ -1117,23 +1142,24 @@ body {
   }
 }
 
-/* El susurro sube 14 px y se desvanece en 2.6 s. */
+/* El susurro sube 14 px y se desvanece en 2.6 s, con la inclinacion que le
+   toque a esa frase. */
 @keyframes whisper-rise {
   0% {
     opacity: 0;
-    transform: translate(-50%, 8px);
+    transform: translate(-50%, 8px) rotate(var(--wr, 0deg));
   }
   14% {
     opacity: 1;
-    transform: translate(-50%, 0);
+    transform: translate(-50%, 0) rotate(var(--wr, 0deg));
   }
   72% {
     opacity: 1;
-    transform: translate(-50%, -8px);
+    transform: translate(-50%, -8px) rotate(var(--wr, 0deg));
   }
   100% {
     opacity: 0;
-    transform: translate(-50%, -14px);
+    transform: translate(-50%, -14px) rotate(var(--wr, 0deg));
   }
 }
 
@@ -1150,7 +1176,7 @@ body {
   .flower-whisper {
     animation-name: chrome-in;
     animation-duration: 300ms;
-    transform: translateX(-50%);
+    transform: translateX(-50%) rotate(var(--wr, 0deg));
   }
 }
 
@@ -1158,6 +1184,8 @@ body {
 .album-page[data-single='true'] {
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .album-page[data-single='true'] .spread-pad {

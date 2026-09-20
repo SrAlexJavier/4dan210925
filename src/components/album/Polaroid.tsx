@@ -51,8 +51,16 @@ function Accent({ kind }: { kind?: PhotoItem['accent'] }) {
   );
 }
 
+/**
+ * Las fotos que ya estan decodificadas no vuelven a hacer fade. Sin esto,
+ * cada cara de la hoja que gira monta un `<img>` nuevo que arranca en
+ * `opacity: 0` y ensena el color de reserva: un parpadeo marron justo en el
+ * momento en que la pagina esta a la vista.
+ */
+const decoded = new Set<string>();
+
 export function Polaroid({ photo, className }: { photo: PhotoItem; className?: string }) {
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(() => decoded.has(photo.src));
 
   return (
     <figure
@@ -67,8 +75,12 @@ export function Polaroid({ photo, className }: { photo: PhotoItem; className?: s
           src={photo.src}
           alt={photo.alt}
           decoding="async"
+          draggable={false}
           data-ready={ready ? 'true' : 'false'}
-          onLoad={() => setReady(true)}
+          onLoad={() => {
+            decoded.add(photo.src);
+            setReady(true);
+          }}
           onError={() => setReady(false)}
         />
       </div>

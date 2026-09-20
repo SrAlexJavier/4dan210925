@@ -44,6 +44,26 @@ interface SpreadPagesProps {
   single: boolean;
 }
 
+/**
+ * Una cara de la hoja que gira: es exactamente del tamano de UNA pagina, asi
+ * que pinta esa mitad y ya. (Antes se pintaba el pliego entero al 200 % y se
+ * recortaba, que obligaba a cuadrar el gutter dos veces.)
+ */
+export function SpreadFace({ halves, side, single }: SpreadPagesProps & { side: 'left' | 'right' }) {
+  return (
+    <div className="album-page" data-single={single ? 'true' : 'false'}>
+      {single ? (
+        <>
+          {halves.left}
+          {halves.right}
+        </>
+      ) : (
+        halves[side]
+      )}
+    </div>
+  );
+}
+
 export function SpreadPages({ halves, single }: SpreadPagesProps) {
   if (single) {
     return (
