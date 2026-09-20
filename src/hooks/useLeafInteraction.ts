@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import { useThree, type ThreeEvent } from '@react-three/fiber';
-import { LEAF } from '../constants/flowerModel';
+import { IDLE, LEAF } from '../constants/flowerModel';
 import type { LeafRig } from '../components/3d/Leaf';
 import type { FallenPetalsHandle } from '../components/3d/FallenPetals';
 import type { PollenHandle } from '../components/3d/FloatingPollen';
@@ -230,7 +230,7 @@ export function useLeafInteraction(opts: Options) {
     [release],
   );
 
-  const update = (deltaMs: number, albumTilt: number) => {
+  const update = (deltaMs: number, albumTilt: number, time = 0) => {
     const dt = Math.min(deltaMs, 40) / 1000;
     const dragging = drag.current?.id ?? -1;
     const reduced = optsRef.current.reduced;
@@ -258,8 +258,18 @@ export function useLeafInteraction(opts: Options) {
       if (m.sweepAt < 1.2) m.sweepAt += deltaMs / 260;
       rig.bend.uSweep.value = m.sweepAt;
 
-      rig.drive.bend = m.bend;
-      rig.drive.caress = m.caress;
+      /**
+       * Balanceo en reposo, desfasado por hoja. El viento del tallo mueve a
+       * las tres a la vez; sin esto las hojas se leen como piezas pegadas.
+       */
+      const sway =
+        time === 0 || id === dragging
+          ? 0
+          : Math.sin((time * 2 * Math.PI) / IDLE.leafSwayCycle + id * 2.1) *
+            IDLE.leafSwayAmplitude;
+
+      rig.drive.bend = m.bend + sway * 0.6;
+      rig.drive.caress = m.caress + sway;
       rig.drive.restingWeight = m.restingPetals * LEAF.restingWeightPerPetal;
       rig.drive.albumTilt = albumTilt;
       rig.material.emissiveIntensity = id === dragging ? 0.05 : 0;

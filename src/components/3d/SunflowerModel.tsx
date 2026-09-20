@@ -25,6 +25,7 @@ import { Ligule } from './Ligule';
 import { LiguleRingInstanced } from './LiguleRingInstanced';
 import { SeedDisc } from './SeedDisc';
 import { Stem } from './Stem';
+import { Receptacle } from './Receptacle';
 import { Leaf } from './Leaf';
 import { FallenPetals, type FallenPetalsHandle } from './FallenPetals';
 import { FloatingPollen, type PollenHandle } from './FloatingPollen';
@@ -172,9 +173,8 @@ export function SunflowerModel({ reduced, onHover }: SunflowerModelProps) {
     albumMix.current += (mixTarget - albumMix.current) * Math.min(1, step / 620);
     const mix = albumMix.current;
 
-    leaves.update(step, mix * IDLE.albumLeafTilt);
-
     const t = state.clock.elapsedTime;
+    leaves.update(step, mix * IDLE.albumLeafTilt, reduced ? 0 : t);
     const windAmp = reduced ? 0 : IDLE.windAmplitude * (1 - mix * (1 - IDLE.windAlbumFactor));
     const wind = (phase: number) =>
       (Math.sin((t * 2 * Math.PI) / IDLE.windCycle + phase) * 0.6 +
@@ -213,16 +213,28 @@ export function SunflowerModel({ reduced, onHover }: SunflowerModelProps) {
       );
     }
 
+    /**
+     * El cuello y el tallo siguen a la cabeza con una fraccion del angulo.
+     * Girar solo la cabeza deja el tallo como un palo clavado; girarlo entero
+     * con el mismo angulo lo convierte en una pajita. La proporcion 1 / 0.32 /
+     * 0.12 es lo que se lee como un ser vivo que se vuelve hacia algo.
+     */
     const neck = neckRef.current;
     if (neck) {
-      neck.rotation.set(wind(0.6) * 0.7 - leanY * neckK, wind(1.7) * 0.5 + leanX * neckK, 0);
+      neck.rotation.set(
+        helio.current.pitch * IDLE.helioNeckShare + wind(0.6) * 0.7 - leanY * neckK,
+        helio.current.yaw * IDLE.helioNeckShare + wind(1.7) * 0.5 + leanX * neckK,
+        0,
+      );
     }
 
     const stemGroup = stemGroupRef.current;
     if (stemGroup) {
+      // El giro es sobre la base del tallo, que queda fuera de cuadro: lo que
+      // se ve es la planta entera inclinandose, no un pivote.
       stemGroup.rotation.set(
-        wind(1.3) * 0.5 - leanY * stemK,
-        wind(0.2) * 0.3 + leanX * stemK,
+        helio.current.pitch * IDLE.helioStemShare + wind(1.3) * 0.5 - leanY * stemK,
+        helio.current.yaw * IDLE.helioStemShare + wind(0.2) * 0.3 + leanX * stemK,
         -mix * IDLE.albumStemGive,
       );
     }
@@ -364,6 +376,7 @@ export function SunflowerModel({ reduced, onHover }: SunflowerModelProps) {
 
         <group ref={neckRef} position={[0, STEM.length, 0]}>
           <group ref={headRef}>
+            <Receptacle />
             <group ref={discGroupRef}>
               <SeedDisc introRef={introRef} reduced={reduced} throttled={isAlbumOpen} />
               <mesh

@@ -15,34 +15,34 @@ export function A11yMirror() {
       <div className="a11y-mirror" role="group" aria-label="Girasol interactivo">
         <button
           type="button"
-          style={{ left: '25%', top: '34%' }}
+          style={{ left: '27%', top: '30%' }}
           onClick={() => flowerRef.current?.pluckNext()}
         >
           Arrancar un petalo
         </button>
         <button
           type="button"
-          style={{ left: '17%', top: '66%' }}
+          style={{ left: '16%', top: '72%' }}
           onClick={() => flowerRef.current?.brushLeaf(0)}
         >
           Acariciar la hoja grande
         </button>
         <button
           type="button"
-          style={{ left: '33%', top: '56%' }}
+          style={{ left: '38%', top: '64%' }}
           onClick={() => flowerRef.current?.brushLeaf(1)}
         >
           Acariciar la hoja del lado derecho
         </button>
         <button
           type="button"
-          style={{ left: '25%', top: '42%' }}
+          style={{ left: '27%', top: '40%' }}
           onClick={() => flowerRef.current?.touchDisc()}
         >
           Tocar el centro de la flor
         </button>
         {missingPetals >= REBLOOM.missingForButton && (
-          <button type="button" style={{ left: '25%', top: '74%' }} onClick={rebloom}>
+          <button type="button" style={{ left: '27%', top: '84%' }} onClick={rebloom}>
             Volver a florecer
           </button>
         )}

@@ -16,14 +16,14 @@ interface Spot {
  * una voz que no sale siempre del mismo sitio.
  *
  * Los rangos son los que dejan la frase dentro de la columna de la flor: en
- * escritorio nunca pasa del 40 % (el album empieza en el 46 %) y en movil
- * evita el titulo por arriba y el dock del album por abajo.
+ * escritorio nunca pasa del 48 % (el album abierto empieza en el 52 %) y en
+ * movil evita el titulo por arriba y el dock del album por abajo.
  */
 function randomSpot(narrow: boolean): Spot {
   const r = Math.random;
   return narrow
     ? { x: 24 + r() * 52, y: 28 + r() * 28, tilt: (r() - 0.5) * 6 }
-    : { x: 13 + r() * 27, y: 32 + r() * 44, tilt: (r() - 0.5) * 6 };
+    : { x: 12 + r() * 36, y: 28 + r() * 46, tilt: (r() - 0.5) * 6 };
 }
 
 export function FlowerWhisper() {

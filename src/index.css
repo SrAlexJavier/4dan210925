@@ -193,7 +193,7 @@ img {
   position: absolute;
   z-index: 20;
   top: clamp(56px, 9vh, 104px);
-  left: 25%;
+  left: 27%;
   transform: translateX(-50%);
   width: min(42ch, 44vw);
   text-align: center;
@@ -223,16 +223,23 @@ img {
 
 .flower-whisper {
   position: absolute;
-  z-index: 40;
-  left: 25%;
+  /* Por encima del canvas (50): si no, el bloom y el polen se pintan encima
+     de la frase y se lee a medias. */
+  z-index: 70;
+  left: 27%;
   bottom: clamp(48px, 12vh, 132px);
   transform: translateX(-50%);
   pointer-events: none;
   font-family: var(--hand);
   font-weight: 500;
   font-size: var(--t-25);
-  color: #f0e6d2;
-  text-shadow: 0 2px 14px rgba(10, 14, 11, 0.7);
+  color: #f8f0e0;
+  /* Tres sombras: la frase cae sobre petalos claros tanto como sobre el fondo
+     oscuro, y tiene que leerse en los dos. */
+  text-shadow:
+    0 1px 2px rgba(10, 14, 11, 0.9),
+    0 2px 14px rgba(10, 14, 11, 0.8),
+    0 0 26px rgba(10, 14, 11, 0.6);
   white-space: nowrap;
 }
 
@@ -329,8 +336,8 @@ img {
   z-index: 30;
   opacity: 0;
   animation: chrome-in 500ms ease-out 1950ms forwards;
-  left: 62%;
-  top: 50%;
+  left: 69%;
+  top: 60%;
   transform: translate(-50%, -50%);
   display: flex;
   flex-direction: column;
@@ -339,8 +346,8 @@ img {
 }
 
 .album-panel__button {
-  --w: 280px;
-  --h: 360px;
+  --w: 240px;
+  --h: 310px;
   position: relative;
   width: var(--w);
   height: var(--h);
@@ -515,8 +522,8 @@ img {
   pointer-events: none;
   background: linear-gradient(
     to right,
-    transparent 46%,
-    rgba(20, 26, 20, 0.4) 72%,
+    transparent 52%,
+    rgba(20, 26, 20, 0.4) 78%,
     rgba(20, 26, 20, 0.4) 100%
   );
   opacity: 0;
@@ -550,8 +557,8 @@ img {
 .album-frame {
   position: absolute;
   /* Centrado estatico: solo se animan width y height, nunca este transform. */
-  left: 62%;
-  top: 50%;
+  left: 71%;
+  top: 52%;
   transform: translate(-50%, -50%);
   border-radius: 10px;
   background: var(--linen);
@@ -576,8 +583,8 @@ img {
 
 .album-proxy {
   position: absolute;
-  left: 62%;
-  top: 50%;
+  left: 71%;
+  top: 52%;
   transform: translate(-50%, -50%);
   border-radius: 10px;
   background: var(--linen);
@@ -990,22 +997,23 @@ img {
 
 @media (max-width: 1099px) and (min-width: 900px) {
   .album-panel {
-    left: 60%;
+    left: 68%;
+    top: 61%;
   }
   .album-panel__button {
-    --w: 240px;
-    --h: 310px;
+    --w: 206px;
+    --h: 266px;
   }
   .album-frame,
   .album-proxy {
-    left: 60%;
+    left: 70%;
   }
   .header-overlay {
-    left: 24%;
-    width: min(38ch, 46vw);
+    left: 26%;
+    width: min(38ch, 48vw);
   }
   .flower-whisper {
-    left: 24%;
+    left: 26%;
   }
 }
 

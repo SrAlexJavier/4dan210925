@@ -72,13 +72,25 @@ export const CROWN = {
 /* ── Tallo ─────────────────────────────────────────────────────────── */
 
 export const STEM = {
-  length: 1.55,
+  /**
+   * Mas largo que en v3. La cabeza mide 1.0 de diametro y va en el extremo,
+   * asi que el tallo es lo unico que separa las hojas del disco: con 1.55 la
+   * insercion de la hoja alta caia DENTRO del circulo de la cabeza y el
+   * peciolo se dibujaba por delante de los petalos.
+   */
+  length: 2.05,
   baseRadius: 0.021,
   neckRadius: 0.014,
   lateralDrift: 0.03,
   radialSegments: 8,
   tubularSegments: 28,
 } as const;
+
+/**
+ * Altura maxima de insercion sin que la hoja invada el circulo de la cabeza.
+ * La cabeza esta centrada en `STEM.length` y su radio es 0.5.
+ */
+export const LEAF_HEIGHT_MAX = (STEM.length - 0.56) / STEM.length;
 
 /* ── Hojas ─────────────────────────────────────────────────────────── */
 
@@ -102,21 +114,21 @@ export interface LeafSpec {
 }
 
 export const LEAVES: LeafSpec[] = [
-  { id: 0, length: 0.55, width: 0.44, height: 0.34, azimuth: 205 * DEG, petiole: 0.1, elevation: 16 * DEG },
+  { id: 0, length: 0.55, width: 0.44, height: 0.24, azimuth: 205 * DEG, petiole: 0.1, elevation: 16 * DEG },
   {
     // Es la hoja que cruza por delante del album: su limbo es grande a
     // proposito, porque el primer plano se gana con la hoja, no con un
     // peciolo largo que se lee como un alambre.
     id: 1,
-    length: 0.98,
-    width: 0.6,
-    height: 0.8,
+    length: 1.05,
+    width: 0.63,
+    height: 0.72,
     azimuth: 332 * DEG,
     petiole: 0.2,
     elevation: 16 * DEG,
     crosses: true,
   },
-  { id: 2, length: 0.38, width: 0.31, height: 0.86, azimuth: 160 * DEG, petiole: 0.08, elevation: 22 * DEG },
+  { id: 2, length: 0.38, width: 0.31, height: 0.6, azimuth: 160 * DEG, petiole: 0.08, elevation: 22 * DEG },
 ];
 
 /** 900–1099 px: la hoja frontal acorta su alcance. */
@@ -124,8 +136,8 @@ export const CROSSING_SCALE_MD = 0.62;
 
 /** < 600 px: L3 se elimina y L1/L2 se pliegan hacia el plano de cámara. */
 export const LEAVES_SM: LeafSpec[] = [
-  { id: 0, length: 0.5, width: 0.4, height: 0.34, azimuth: 205 * DEG, petiole: 0.08, elevation: 16 * DEG },
-  { id: 1, length: 0.44, width: 0.36, height: 0.66, azimuth: 335 * DEG, petiole: 0.1, elevation: 12 * DEG },
+  { id: 0, length: 0.5, width: 0.4, height: 0.28, azimuth: 205 * DEG, petiole: 0.08, elevation: 16 * DEG },
+  { id: 1, length: 0.44, width: 0.36, height: 0.56, azimuth: 335 * DEG, petiole: 0.1, elevation: 12 * DEG },
 ];
 
 export const LEAF = {
@@ -210,11 +222,21 @@ export const BLOOM_IN = {
 
 export const IDLE = {
   windCycle: 10.5,
-  windAmplitude: 0.055,
+  windAmplitude: 0.075,
   windAlbumFactor: 0.45,
-  helioYaw: 12 * DEG,
-  helioPitch: 8 * DEG,
+  helioYaw: 22 * DEG,
+  helioPitch: 14 * DEG,
   helioDamping: 0.06,
+  /**
+   * El heliotropismo no es solo de la cabeza: el tallo acompana con un angulo
+   * menor y las hojas van con el, porque cuelgan del mismo grupo. Un tallo
+   * que no se entera de que la cabeza ha girado se lee como un palo clavado.
+   */
+  helioNeckShare: 0.32,
+  helioStemShare: 0.12,
+  /** Balanceo propio de cada hoja en reposo, desfasado entre ellas. */
+  leafSwayAmplitude: 0.055,
+  leafSwayCycle: 7.4,
   /** Mientras el álbum está abierto. */
   albumYaw: 18 * DEG,
   albumPitch: -4 * DEG,
@@ -227,11 +249,11 @@ export const IDLE = {
 /* ── Encuadre (§2) ─────────────────────────────────────────────────── */
 
 export const FRAMING = {
-  headFractionOfHeight: 0.44,
+  headFractionOfHeight: 0.52,
   plantWidthInHeads: 1.55,
-  columnFraction: 0.46,
-  axisFraction: 0.25,
-  yFraction: 0.06,
+  columnFraction: 0.54,
+  axisFraction: 0.27,
+  yFraction: 0.04,
 } as const;
 
 export const FRAMING_SM = {

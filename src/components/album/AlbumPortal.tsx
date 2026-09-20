@@ -16,8 +16,8 @@ const COVER_MS = 620;
 const COVER_BACK_MS = 520;
 
 function closedSize(width: number): [number, number] {
-  if (width >= BREAKPOINTS.lg) return [280, 360];
-  if (width >= BREAKPOINTS.md) return [240, 310];
+  if (width >= BREAKPOINTS.lg) return [240, 310];
+  if (width >= BREAKPOINTS.md) return [206, 266];
   if (width >= BREAKPOINTS.sm) return [220, 132];
   return [Math.min(width * 0.86, 300), 120];
 }
@@ -26,9 +26,10 @@ function openSize(width: number, height: number): [number, number] {
   if (width < BREAKPOINTS.md) {
     return [Math.min(width * 0.92, 560), Math.min(height * 0.74, 640)];
   }
-  // 44 % del ancho centrado en el 62 % deja el borde izquierdo en el 40 %:
-  // por delante del corredor, sin entrar en la columna de la flor.
-  return [Math.min(width * 0.44, 900), Math.min(height * 0.72, 660)];
+  // 38 % del ancho centrado en el 71 % deja el borde izquierdo en el 52 %.
+  // La flor ocupa ahora el 54 % izquierdo, asi que el corredor es mas
+  // estrecho y el album tiene que ser mas pequeno para respetarlo.
+  return [Math.min(width * 0.38, 760), Math.min(height * 0.7, 620)];
 }
 
 /**
