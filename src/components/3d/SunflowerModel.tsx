@@ -19,6 +19,7 @@ import { useContent } from '../../context/ContentContext';
 import { useStageFraming } from '../../hooks/useStageFraming';
 import { usePetalInteraction, type HoverKind } from '../../hooks/usePetalInteraction';
 import { useLeafInteraction } from '../../hooks/useLeafInteraction';
+import { useStemInteraction } from '../../hooks/useStemInteraction';
 import { isOverChrome } from '../../hooks/usePointerGuard';
 import { discChime } from '../audio/sceneAudio';
 import { Ligule } from './Ligule';
@@ -108,6 +109,14 @@ export function SunflowerModel({ reduced, onHover }: SunflowerModelProps) {
     onInteract: markInteraction,
   });
 
+  const stem = useStemInteraction({
+    enabled: interactionEnabled,
+    reduced,
+    headSizeRef,
+    onHover,
+    onInteract: markInteraction,
+  });
+
   /** Tocar el centro de la flor: pulso, destello, polen y susurro. */
   const touchDisc = useCallback(() => {
     markInteraction();
@@ -124,10 +133,11 @@ export function SunflowerModel({ reduced, onHover }: SunflowerModelProps) {
       pluckNext: petals.pluckNext,
       brushLeaf: leaves.brushLeaf,
       touchDisc,
+      nudgeStem: stem.nudge,
       rebloom: petals.rebloom,
     });
     return () => registerFlower(null);
-  }, [registerFlower, petals.pluckNext, petals.rebloom, leaves.brushLeaf, touchDisc]);
+  }, [registerFlower, petals.pluckNext, petals.rebloom, leaves.brushLeaf, stem.nudge, touchDisc]);
 
   // Ceremonia del petalo 21: estallido de polen y refloracion completa.
   useEffect(() => {
@@ -175,6 +185,7 @@ export function SunflowerModel({ reduced, onHover }: SunflowerModelProps) {
 
     const t = state.clock.elapsedTime;
     leaves.update(step, mix * IDLE.albumLeafTilt, reduced ? 0 : t);
+    const push = stem.update(step);
     const windAmp = reduced ? 0 : IDLE.windAmplitude * (1 - mix * (1 - IDLE.windAlbumFactor));
     const wind = (phase: number) =>
       (Math.sin((t * 2 * Math.PI) / IDLE.windCycle + phase) * 0.6 +
@@ -189,11 +200,14 @@ export function SunflowerModel({ reduced, onHover }: SunflowerModelProps) {
       : reduced
         ? 0
         : state.pointer.x * IDLE.helioYaw;
+    // `pointer.y` es +1 arriba. Mirar hacia abajo (rotation.x positivo) es lo
+    // que mete los petalos de abajo detras del tallo, asi que tiene tope.
     const targetPitch = isAlbumOpen
       ? IDLE.albumPitch
       : reduced
         ? 0
-        : -state.pointer.y * IDLE.helioPitch;
+        : -state.pointer.y *
+          (state.pointer.y >= 0 ? IDLE.helioPitchUp : IDLE.helioPitchDown);
     helio.current.yaw += (targetYaw - helio.current.yaw) * damping;
     helio.current.pitch += (targetPitch - helio.current.pitch) * damping;
 
@@ -234,8 +248,8 @@ export function SunflowerModel({ reduced, onHover }: SunflowerModelProps) {
       // se ve es la planta entera inclinandose, no un pivote.
       stemGroup.rotation.set(
         helio.current.pitch * IDLE.helioStemShare + wind(1.3) * 0.5 - leanY * stemK,
-        helio.current.yaw * IDLE.helioStemShare + wind(0.2) * 0.3 + leanX * stemK,
-        -mix * IDLE.albumStemGive,
+        helio.current.yaw * IDLE.helioStemShare + wind(0.2) * 0.3 + leanX * stemK + push.twist,
+        -mix * IDLE.albumStemGive + push.lean,
       );
     }
 
@@ -349,7 +363,13 @@ export function SunflowerModel({ reduced, onHover }: SunflowerModelProps) {
       </mesh>
 
       <group ref={stemGroupRef}>
-        <Stem introRef={introRef} reduced={reduced} />
+        <Stem
+          introRef={introRef}
+          reduced={reduced}
+          onOver={stem.onOver}
+          onOut={stem.onOut}
+          onDown={stem.onDown}
+        />
 
         {specs.map((spec, order) => (
           <Leaf
@@ -375,7 +395,7 @@ export function SunflowerModel({ reduced, onHover }: SunflowerModelProps) {
         />
 
         <group ref={neckRef} position={[0, STEM.length, 0]}>
-          <group ref={headRef}>
+          <group ref={headRef} position={[0, 0, IDLE.headForward]}>
             <Receptacle />
             <group ref={discGroupRef}>
               <SeedDisc introRef={introRef} reduced={reduced} throttled={isAlbumOpen} />

@@ -155,6 +155,18 @@ export const LEAF = {
   maxRestingPetals: 3,
 } as const;
 
+/* ── Empuje del tallo ──────────────────────────────────────────────── */
+
+export const STEM_DRAG = {
+  /** Inclinacion lateral de la planta entera. */
+  leanMax: 9 * DEG,
+  /** Giro sobre su propio eje: la cabeza se ensena de perfil. */
+  twistMax: 16 * DEG,
+  /** Recorrido del puntero, en diametros de cabeza, para llegar al maximo. */
+  travel: 0.75,
+  spring: { stiffness: 90, damping: 13 },
+} as const;
+
 /* ── Tirón del pétalo ──────────────────────────────────────────────── */
 
 export const PULL = {
@@ -225,7 +237,14 @@ export const IDLE = {
   windAmplitude: 0.075,
   windAlbumFactor: 0.45,
   helioYaw: 22 * DEG,
-  helioPitch: 14 * DEG,
+  /**
+   * El cabeceo es ASIMETRICO a proposito. Al mirar hacia abajo, los petalos
+   * de las seis en punto rotan hacia -z y se meten por detras del tallo, que
+   * entonces se dibuja por encima de la flor. Mirar hacia arriba no tiene ese
+   * problema, asi que tiene mas recorrido.
+   */
+  helioPitchUp: 18 * DEG,
+  helioPitchDown: 9 * DEG,
   helioDamping: 0.06,
   /**
    * El heliotropismo no es solo de la cabeza: el tallo acompana con un angulo
@@ -234,6 +253,12 @@ export const IDLE = {
    */
   helioNeckShare: 0.32,
   helioStemShare: 0.12,
+  /**
+   * La cabeza va adelantada respecto al eje del tallo. Ademas de ser lo que
+   * hace un girasol de verdad, es el margen que permite cabecear sin que los
+   * petalos de abajo crucen por detras del tubo del tallo.
+   */
+  headForward: 0.12,
   /** Balanceo propio de cada hoja en reposo, desfasado entre ellas. */
   leafSwayAmplitude: 0.055,
   leafSwayCycle: 7.4,

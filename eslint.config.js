@@ -29,6 +29,7 @@ export default defineConfig([
       'src/components/3d/**/*.{ts,tsx}',
       'src/hooks/usePetalInteraction.ts',
       'src/hooks/useLeafInteraction.ts',
+      'src/hooks/useStemInteraction.ts',
     ],
     rules: {
       'react-hooks/immutability': 'off',

@@ -296,7 +296,7 @@ export function AlbumPortal() {
       {showProxy && (
         <div
           className="album-proxy"
-          style={{ width, height }}
+          style={{ width, height, ['--lay' as string]: grown ? '0deg' : '40deg' }}
           data-fading={phase === 'handoff' ? 'true' : 'false'}
           aria-hidden="true"
         >

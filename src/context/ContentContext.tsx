@@ -27,6 +27,7 @@ export interface FlowerApi {
   pluckNext: () => void;
   brushLeaf: (index: number) => void;
   touchDisc: () => void;
+  nudgeStem: () => void;
   rebloom: () => void;
 }
 

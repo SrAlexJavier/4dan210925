@@ -44,14 +44,16 @@ SunflowerModel                      src/components/3d/SunflowerModel.tsx
 ├── directionalLight  rim + target      sigue al puntero
 ├── hemisphereLight   fill
 ├── mesh              sombra de contacto (sprite)
-└── group  stemGroupRef ............... base + 12 % del heliotropismo
-    ├── Stem                            src/components/3d/Stem.tsx
+└── group  stemGroupRef ............... base + 12 % del heliotropismo + empuje
+    ├── Stem  (+ proxy de agarre)       src/components/3d/Stem.tsx
     ├── Leaf × 3 (2 en móvil)           src/components/3d/Leaf.tsx
     │   └── anchor → petiole → blade    jerarquía del doblado
     ├── FallenPetals  (pool de 8)       src/components/3d/FallenPetals.tsx
     └── group  neckRef ................ 32 % del heliotropismo
-        └── group  headRef ............ heliotropismo completo + viento + tirón
+        └── group  headRef ............ heliotropismo + viento + tirón
+                                          (adelantada 0.12 sobre el eje)
             ├── Receptacle              src/components/3d/Receptacle.tsx
+            │                           (tapa la unión tallo-cabeza)
             ├── group  discGroupRef
             │   ├── SeedDisc            src/components/3d/SeedDisc.tsx
             │   └── mesh  proxy del disco
@@ -70,6 +72,7 @@ cabeza deja el tallo como un palo clavado.
 
 | z  | Elemento                    | pointer-events |
 |----|-----------------------------|----------------|
+| 200| `.cursor-layer` (resplandor)| none           |
 | 80 | `.album-anchor` (abierto)   | auto           |
 | 70 | Susurro de la flor          | none           |
 | 60 | AudioToggles, A11yMirror    | auto           |
@@ -78,6 +81,10 @@ cabeza deja el tallo como un palo clavado.
 | 25 | `.album-scrim`              | none           |
 | 20 | HeaderOverlay               | none           |
 | 10 | Capas de fondo (3)          | none           |
+
+El cursor del sistema se oculta (`body[data-cursor="glow"]`) solo cuando hay
+puntero fino; el resplandor cambia de tamaño y color según `data-hover`, que
+es lo que sustituye a los cursores `grab` / `pointer`.
 
 El canvas se pinta **encima** del álbum pero **escucha desde debajo**
 (`eventSource` apunta a `.stage`): por eso una hoja puede cruzar por delante
@@ -91,6 +98,7 @@ arranque un pétalo está en `usePointerGuard`.
 | `useStageFraming`      | Tamaño y posición de la planta según el viewport      |
 | `usePetalInteraction`  | Estados de las 21 lígulas, tirón, oráculo             |
 | `useLeafInteraction`   | Pecíolo, `uBend`, balanceo en reposo, peso de pétalos |
+| `useStemInteraction`   | Empuje lateral del tallo: inclina y gira la planta     |
 | `usePointerGuard`      | `isOverAlbum` / `isOverChrome`                        |
 | `useIdleTimer`         | Refloración silenciosa a los 22 s                     |
 | `usePreloadImages`     | Pliego visible → vecinos → resto                      |

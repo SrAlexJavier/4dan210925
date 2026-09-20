@@ -12,6 +12,15 @@ import {
   type SpreadHalves,
 } from './AlbumSpread';
 
+/**
+ * Las mitades de cada pliego se construyen una sola vez. Sin esto, cada giro
+ * crea elementos de React nuevos para el pliego que ya estaba en pantalla,
+ * los remonta, y el navegador vuelve a maquetar las dos paginas justo cuando
+ * la hoja empieza a girar: ese es el tiron. El contenido viene de un JSON
+ * estatico, asi que la cache no caduca.
+ */
+const halvesCache = new Map<number, SpreadHalves>();
+
 interface Flip {
   from: number;
   to: number;
@@ -46,17 +55,25 @@ export function AlbumBook() {
 
   const halvesOf = useCallback(
     (index: number): SpreadHalves => {
-      if (index >= spreadCount) {
-        return {
-          left: <CoverPage title={content.album.countLabel} />,
-          right: <CoverPage title={content.album.coverTitle} />,
-        };
-      }
-      const spread = content.album.spreads[index];
-      const photos = spread.photos
-        .map((id) => photoById.get(id))
-        .filter((p): p is NonNullable<typeof p> => !!p);
-      return spreadHalves(spread, photos);
+      const hit = halvesCache.get(index);
+      if (hit) return hit;
+
+      const built: SpreadHalves =
+        index >= spreadCount
+          ? {
+              left: <CoverPage title={content.album.countLabel} />,
+              right: <CoverPage title={content.album.coverTitle} />,
+            }
+          : (() => {
+              const spread = content.album.spreads[index];
+              const photos = spread.photos
+                .map((id) => photoById.get(id))
+                .filter((p): p is NonNullable<typeof p> => !!p);
+              return spreadHalves(spread, photos);
+            })();
+
+      halvesCache.set(index, built);
+      return built;
     },
     [content.album, photoById, spreadCount],
   );
@@ -112,7 +129,8 @@ export function AlbumBook() {
         { transform: 'rotateY(0deg)', ['--flip-shadow' as string]: 0 },
         { transform: `rotateY(${to}deg)`, ['--flip-shadow' as string]: 1 },
       ],
-      { duration, easing: 'cubic-bezier(0.45, 0.05, 0.25, 1)', fill: 'forwards' },
+      // Menos entrada y mas salida: el papel arranca con cuerpo y se posa.
+      { duration, easing: 'cubic-bezier(0.34, 0.66, 0.26, 1)', fill: 'forwards' },
     );
 
     let live = true;
@@ -126,7 +144,9 @@ export function AlbumBook() {
 
     return () => {
       live = false;
-      animation.cancel();
+      // Cancelar una animacion ya terminada devuelve la hoja a 0 grados
+      // durante el frame en que se desmonta: eso es un parpadeo.
+      if (animation.playState !== 'finished') animation.cancel();
     };
   }, [flip, duration, finish]);
 

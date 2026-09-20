@@ -41,6 +41,13 @@ export function A11yMirror() {
         >
           Tocar el centro de la flor
         </button>
+        <button
+          type="button"
+          style={{ left: '27%', top: '78%' }}
+          onClick={() => flowerRef.current?.nudgeStem()}
+        >
+          Empujar el tallo
+        </button>
         {missingPetals >= REBLOOM.missingForButton && (
           <button type="button" style={{ left: '27%', top: '84%' }} onClick={rebloom}>
             Volver a florecer

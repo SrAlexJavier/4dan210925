@@ -4,6 +4,7 @@ import { HeaderOverlay } from '../ui/HeaderOverlay';
 import { AudioToggles } from '../ui/AudioToggles';
 import { FlowerWhisper } from '../ui/FlowerWhisper';
 import { A11yMirror } from '../ui/A11yMirror';
+import { CursorGlow } from '../ui/CursorGlow';
 import { AlbumPanel } from '../album/AlbumPanel';
 import { FlowerCanvas } from '../3d/FlowerCanvas';
 import { StaticPoster } from '../fallback/StaticPoster';
@@ -55,6 +56,7 @@ export function Stage() {
       <FlowerWhisper />
       <A11yMirror />
       <AudioToggles />
+      <CursorGlow hover={hover} pulling={isPulling} />
     </div>
   );
 }

@@ -15,6 +15,7 @@ export function AlbumPanel() {
 
   return (
     <div className="album-panel" data-album-surface>
+      <span className="album-cover__rest" aria-hidden="true" />
       <button
         type="button"
         className="album-panel__button"
@@ -24,7 +25,6 @@ export function AlbumPanel() {
         data-album-open-button
       >
         <span className="album-cover">
-          <span className="album-cover__peek" aria-hidden="true" />
           <svg className="album-cover__linen" aria-hidden="true" focusable="false">
             <filter id="linen-weave">
               <feTurbulence type="fractalNoise" baseFrequency="0.9 0.35" numOctaves="2" />

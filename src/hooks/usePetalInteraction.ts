@@ -21,7 +21,7 @@ import {
   type TensionHandle,
 } from '../components/audio/sceneAudio';
 
-export type HoverKind = 'ligule' | 'leaf' | 'disc' | null;
+export type HoverKind = 'ligule' | 'leaf' | 'disc' | 'stem' | null;
 
 interface Options {
   enabled: boolean;

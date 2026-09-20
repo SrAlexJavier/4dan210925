@@ -332,6 +332,9 @@ img {
    ────────────────────────────────────────────────────────────────────── */
 
 .album-panel {
+  /* El tamano vive aqui: la sombra de apoyo es hermana del boton y lo lee. */
+  --w: 240px;
+  --h: 310px;
   position: absolute;
   z-index: 30;
   opacity: 0;
@@ -340,14 +343,15 @@ img {
   top: 60%;
   transform: translate(-50%, -50%);
   display: flex;
-  flex-direction: column;
+  /* Las etiquetas van ARRIBA: por debajo del libro pasa la hoja frontal, y
+     un texto cortado por una hoja se lee como un fallo, no como profundidad. */
+  flex-direction: column-reverse;
   align-items: center;
-  gap: 14px;
+  /* Holgado a proposito: al incorporarse, el canto de arriba sube 30 px. */
+  gap: 38px;
 }
 
 .album-panel__button {
-  --w: 240px;
-  --h: 310px;
   position: relative;
   width: var(--w);
   height: var(--h);
@@ -358,6 +362,12 @@ img {
   perspective: 1400px;
 }
 
+/**
+ * El album no flota: esta apoyado. `--lay` es el angulo con el que se tumba
+ * sobre una mesa que no se dibuja, y al pasar por encima se incorpora. La
+ * sombra de apoyo (`.album-cover__rest`) es lo que convierte ese angulo en
+ * una superficie: sin ella el libro solo parece torcido.
+ */
 .album-cover {
   display: block;
   position: relative;
@@ -365,7 +375,13 @@ img {
   height: 100%;
   border-radius: 4px 10px 10px 4px;
   background: var(--linen);
-  transform: rotateY(-9deg) rotateX(4deg);
+  --lay: 44deg;
+  --lift: 0px;
+  /* El pivote va cerca del borde superior: asi el canto de arriba se queda
+     donde esta al incorporarse y la etiqueta no baila. Lo que se levanta es
+     el canto de abajo, que es el que estaba apoyado. */
+  transform-origin: 50% 18%;
+  transform: translateY(var(--lift)) rotateX(var(--lay)) rotateZ(-3deg);
   transform-style: preserve-3d;
   box-shadow:
     0 18px 38px -14px rgba(8, 12, 9, 0.85),
@@ -373,8 +389,29 @@ img {
   /* Respiracion: es lo que dice «esto se puede pulsar». */
   animation: album-breathe 4.2s ease-in-out infinite;
   transition:
-    filter 240ms cubic-bezier(0.34, 1.4, 0.64, 1),
-    box-shadow 240ms ease;
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 240ms ease,
+    box-shadow 420ms ease;
+}
+
+/* La mancha de apoyo sobre la mesa invisible. */
+.album-cover__rest {
+  position: absolute;
+  left: 50%;
+  bottom: -14px;
+  width: calc(var(--w) * 0.86);
+  height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(6, 10, 7, 0.72), rgba(6, 10, 7, 0));
+  filter: blur(4px);
+  opacity: 0.8;
+  pointer-events: none;
+  /* En reposo la mancha esta pegada al canto apoyado; al levantarse el libro,
+     se separa, se ensancha y se aclara. */
+  transform: translate(-50%, -74px) scale(0.9);
+  transition:
+    transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 420ms ease;
 }
 
 @keyframes album-breathe {
@@ -458,37 +495,21 @@ img {
 }
 
 /* La tapa se abre 10 grados y la primera foto asoma. */
-.album-cover__peek {
-  display: block;
-  position: absolute;
-  right: 4px;
-  top: 18px;
-  bottom: 18px;
-  width: 42%;
-  border-radius: 0 3px 3px 0;
-  background: var(--paper);
-  /* En un contexto preserve-3d manda la Z, no el z-index: la primera foto
-     asoma por DETRAS de la tapa, que es de donde saldria en un libro. */
-  transform: translate3d(0, 0, -6px);
-  opacity: 0;
-  transition:
-    transform 240ms cubic-bezier(0.34, 1.4, 0.64, 1),
-    opacity 240ms ease;
-}
-
 .album-panel__button:hover .album-cover,
 .album-panel__button:focus-visible .album-cover {
-  filter: brightness(1.06);
+  --lay: 14deg;
+  --lift: -12px;
+  filter: brightness(1.07);
   box-shadow:
-    0 18px 38px -14px rgba(8, 12, 9, 0.85),
-    0 44px 80px -30px rgba(8, 12, 9, 0.6),
-    0 0 46px -6px rgba(201, 162, 39, 0.35);
+    0 26px 48px -14px rgba(8, 12, 9, 0.88),
+    0 62px 110px -34px rgba(8, 12, 9, 0.7),
+    0 0 52px -6px rgba(201, 162, 39, 0.35);
 }
 
-.album-panel__button:hover .album-cover__peek,
-.album-panel__button:focus-visible .album-cover__peek {
-  transform: translate3d(8px, 0, -6px);
-  opacity: 1;
+.album-panel:hover .album-cover__rest,
+.album-panel:focus-within .album-cover__rest {
+  transform: translate(-50%, -6px) scale(1.2);
+  opacity: 0.45;
 }
 
 .album-panel__count {
@@ -500,7 +521,7 @@ img {
 
 .album-panel__cta {
   position: absolute;
-  bottom: -30px;
+  top: -34px;
   font-size: var(--t-13);
   font-variation-settings: 'opsz' 14;
   color: var(--paper);
@@ -585,11 +606,15 @@ img {
   position: absolute;
   left: 71%;
   top: 52%;
-  transform: translate(-50%, -50%);
+  /* Sale del angulo en que estaba apoyado y se pone de cara mientras crece:
+     asi la apertura continua el gesto del hover en vez de cortarlo. */
+  transform: translate(-50%, -50%) perspective(1600px) rotateX(var(--lay, 0deg));
   border-radius: 10px;
   background: var(--linen);
   pointer-events: none;
-  transition: opacity 120ms ease-out;
+  transition:
+    opacity 120ms ease-out,
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .album-proxy[data-fading='true'] {
@@ -657,6 +682,7 @@ img {
   z-index: 50;
   transform-style: preserve-3d;
   pointer-events: none;
+  will-change: transform;
 }
 
 /* El lomo es el eje: hacia delante la hoja sale de la mitad derecha y gira
@@ -999,8 +1025,6 @@ img {
   .album-panel {
     left: 68%;
     top: 61%;
-  }
-  .album-panel__button {
     --w: 206px;
     --h: 266px;
   }
@@ -1048,19 +1072,34 @@ img {
     top: auto;
     bottom: max(14px, env(safe-area-inset-bottom));
     transform: translateX(-50%);
+    /* En la banda inferior no pasa ninguna hoja por encima: la etiqueta
+       vuelve a su sitio, al lado del lomo. */
     flex-direction: row;
     align-items: center;
     gap: 18px;
   }
 
-  .album-panel__button {
+  .album-panel {
     --w: 220px;
     --h: 132px;
   }
 
   .album-cover {
-    transform: rotateX(8deg);
+    /* En la banda inferior el libro se tumba menos: ya se ve casi de canto. */
+    --lay: 26deg;
     border-radius: 4px 8px 8px 4px;
+  }
+
+  .album-panel__button:hover .album-cover,
+  .album-panel__button:focus-visible .album-cover {
+    --lay: 10deg;
+    --lift: -8px;
+  }
+
+  .album-cover__rest {
+    bottom: -10px;
+    height: 18px;
+    transform: translate(-50%, -34px) scale(0.9);
   }
 
   .album-cover__title {
@@ -1100,7 +1139,7 @@ img {
     --t-31: 25px;
   }
 
-  .album-panel__button {
+  .album-panel {
     --w: min(86vw, 300px);
     --h: 120px;
   }
@@ -1261,5 +1300,110 @@ img {
 
   .album-page[data-single='true'] .spread-collage .polaroid {
     max-width: 44%;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   El puntero: un resplandor que suelta chispas al moverse.
+
+   Se quita el cursor del sistema solo cuando el resplandor esta montado
+   (`data-cursor="glow"`, que solo se pone con puntero fino). En tactil no
+   hay nada que sustituir y todo sigue igual.
+   ────────────────────────────────────────────────────────────────────── */
+
+body[data-cursor='glow'],
+body[data-cursor='glow'] * {
+  cursor: none !important;
+}
+
+.cursor-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  contain: strict;
+}
+
+.cursor-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  opacity: 0;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 238, 186, 0.9),
+    rgba(255, 206, 110, 0.35) 46%,
+    rgba(255, 190, 80, 0) 72%
+  );
+  transition:
+    width 220ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    height 220ms cubic-bezier(0.34, 1.4, 0.64, 1),
+    opacity 220ms ease,
+    background 220ms ease;
+}
+
+.cursor-glow[data-on='true'] {
+  opacity: 1;
+}
+
+/* La afordancia que perdia el cursor nativo, dicha con luz. */
+.cursor-glow[data-state='ligule'] {
+  width: 52px;
+  height: 52px;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 245, 205, 0.95),
+    rgba(255, 201, 60, 0.42) 40%,
+    rgba(255, 201, 60, 0) 72%
+  );
+}
+
+.cursor-glow[data-state='pulling'] {
+  width: 22px;
+  height: 22px;
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 255, 238, 1),
+    rgba(255, 216, 115, 0.6) 44%,
+    rgba(255, 216, 115, 0) 74%
+  );
+}
+
+.cursor-glow[data-state='leaf'],
+.cursor-glow[data-state='stem'] {
+  width: 44px;
+  height: 44px;
+  background: radial-gradient(
+    closest-side,
+    rgba(232, 246, 210, 0.9),
+    rgba(124, 168, 92, 0.38) 44%,
+    rgba(124, 168, 92, 0) 74%
+  );
+}
+
+.cursor-glow[data-state='disc'] {
+  width: 46px;
+  height: 46px;
+}
+
+.cursor-spark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  opacity: 0;
+  background: rgba(255, 236, 175, 0.95);
+  box-shadow: 0 0 6px 1px rgba(255, 206, 110, 0.7);
+  will-change: transform, opacity;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-spark {
+    display: none;
   }
 }
