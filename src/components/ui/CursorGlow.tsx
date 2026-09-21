@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 import { useReducedMotion } from '../../hooks/useReducedMotion';
 import type { HoverKind } from '../../hooks/usePetalInteraction';
@@ -23,6 +24,12 @@ const SPARK_EVERY = 22;
  *
  * Solo donde hay puntero fino con hover. En tactil no hay cursor que
  * sustituir, y el resplandor no se monta.
+ *
+ * Va por `createPortal(document.body)` y no dentro de `.stage`: `#root` tiene
+ * `isolation: isolate`, asi que crea contexto de apilamiento y NINGUN
+ * z-index de dentro puede pasar por encima del album, que tambien es un
+ * portal a `body`. Al quitar el cursor del sistema, un resplandor que se
+ * queda debajo del album deja a la persona sin puntero visible.
  */
 export function CursorGlow({ hover, pulling }: CursorGlowProps) {
   // `hover: hover` ademas de `pointer: fine`: un movil con raton conectado
@@ -130,7 +137,7 @@ export function CursorGlow({ hover, pulling }: CursorGlowProps) {
 
   if (!fine) return null;
 
-  return (
+  return createPortal(
     <div className="cursor-layer" aria-hidden="true">
       <div ref={glowRef} className="cursor-glow" data-on="false" data-state={pulling ? 'pulling' : (hover ?? 'idle')} />
       {Array.from({ length: SPARKS }, (_, i) => (
@@ -142,6 +149,7 @@ export function CursorGlow({ hover, pulling }: CursorGlowProps) {
           className="cursor-spark"
         />
       ))}
-    </div>
+    </div>,
+    document.body,
   );
 }

@@ -1,10 +1,10 @@
 {
   "hero": {
     "title": "Para ti, en este día",
-    "subtitle": "veintiuno de septiembre"
+    "subtitle": "y siempre"
   },
   "flower": {
-    "petalMode": "oracle",
+    "petalMode": "memory",
     "oracle": {
       "enabled": true,
       "phrases": [
@@ -15,24 +15,24 @@
     },
     "petalMemories": [
       "la primera vez que te reíste así",
-      "aquel café que se enfrió entero",
-      "el camino largo, a propósito",
-      "cuando llovió y no nos movimos",
-      "tu letra en el margen",
+      "la primera cena juntos",
+      "el primer viaje juntos",
+      "el primer beso",
+      "el día de playa juntos",
+      "aquella pelicula que no vimos",
+      "la primera serie que no terminamos de ver",
       "la canción que ya es nuestra",
       "el día que no hizo falta hablar",
       "la foto que salió movida",
-      "septiembre, otra vez",
+      "la foto que salió oscura y desenfocada",
+      "setiembre, otra vez",
       "tu mano buscando la mía",
       "el silencio cómodo",
-      "aquella ventana",
       "cuando dijiste que sí",
       "el mapa que no seguimos",
-      "tu abrigo prestado",
-      "la cena quemada",
-      "el último tren",
-      "la playa en invierno",
-      "cuando te quedaste dormida",
+      "la cena con tortitas",
+      "el último metro",
+      "cuando te quedaste dormida (siempre conmigo)",
       "el chiste que solo entendemos",
       "hoy"
     ],
@@ -41,94 +41,131 @@
       "girando hacia ti",
       "buenos días",
       "no te vayas todavía",
-      "te estaba esperando"
+      "te amo siempre",
+      "esperando el golden",
+      "te estaba esperando",
+      "2 gathijos",
+      "viviendo en una cabaña",
+      "siempre mi 11:11",
+      "panzoncita",
+      "volveremos juntos",
+      "problemas? soluciones",
+      "somos equipo"
     ],
     "hint": "tira de un pétalo",
     "rebloomIdleMs": 22000
   },
   "album": {
     "coverTitle": "Nosotros",
-    "countLabel": "Nueve recuerdos",
+    "countLabel": "Muchos recuerdos",
     "openLabel": "Abrir el álbum",
     "closeLabel": "Cerrar el álbum",
     "indicatorLabel": "Recuerdo",
     "photos": [
       {
         "id": "memory-1",
-        "src": "/assets/photos/memory-1.jpg",
-        "alt": "Los dos, muy cerca, en una tarde de luz baja.",
-        "caption": "el principio",
-        "date": "marzo",
+        "src": "/assets/photos/viajes_001.jpg",
+        "alt": "Los dos, nuestras primeras fotos",
+        "caption": "antes del principio",
+        "date": "31/",
+        "rotation": -2.1,
+        "accent": "washi",
+        "dominantColor": "#D6C39F"
+      },
+      {
+        "id": "pic_1",
+        "src": "/assets/photos/divertidos_003.jpg",
+        "alt": "Los dos, nuestras primeras fotos",
+        "caption": "en el pricipio",
+        "date": "31/",
         "rotation": -2.1,
         "accent": "washi",
         "dominantColor": "#D6C39F"
       },
       {
         "id": "memory-2",
-        "src": "/assets/photos/memory-2.jpg",
-        "alt": "Una mesa con dos tazas y las manos alrededor.",
-        "caption": "y el café se enfrió",
+        "src": "/assets/photos/navidad_001.jpg",
+        "alt": "Nuestras primeras navidades.",
+        "caption": "navidad",
         "rotation": 1.6,
         "accent": "clip",
         "dominantColor": "#C19B6C"
       },
       {
         "id": "memory-3",
-        "src": "/assets/photos/memory-3.jpg",
-        "alt": "Retrato a contraluz, sonriendo.",
-        "caption": "esta es mi favorita",
-        "date": "junio",
+        "src": "/assets/photos/navidad_002.jpg",
+        "alt": "siempre tú",
+        "caption": "Rp y Layo casita",
         "rotation": -1.2,
         "accent": "petal",
         "dominantColor": "#AE834F"
       },
       {
         "id": "memory-4",
-        "src": "/assets/photos/memory-4.jpg",
-        "alt": "Un camino entre árboles, al atardecer.",
+        "src": "/assets/photos/comida_001.jpg",
+        "alt": "Si es comida siempre llegas.",
         "rotation": 2.4,
         "accent": "washi",
         "dominantColor": "#937052"
       },
       {
         "id": "memory-5",
-        "src": "/assets/photos/memory-5.jpg",
-        "alt": "Detalle de dos manos entrelazadas.",
+        "src": "/assets/photos/universidad_001.jpg",
+        "alt": "Nuestros días en la UDEP bonita",
         "rotation": -2.8,
         "accent": "clip",
         "dominantColor": "#C5AF83"
       },
       {
         "id": "memory-6",
-        "src": "/assets/photos/memory-6.jpg",
-        "alt": "Una ventana con la ciudad al fondo.",
-        "caption": "desde aquella ventana",
+        "src": "/assets/photos/universidad_002.jpg",
+        "alt": "Sitios raros en la U.",
+        "caption": "Sitios raros en Udep",
         "rotation": 1.1,
         "accent": "stamp",
         "dominantColor": "#AFAD6A"
       },
       {
-        "id": "pic1",
-        "src": "/assets/photos/pic1.jpg",
-        "alt": "Los dos riéndonos de algo que ya no recordamos.",
+        "id": "memory-7",
+        "src": "/assets/photos/playa_001.png",
+        "alt": "dias de playita",
+        "caption": "Dias de playita",
         "rotation": -1.7,
         "accent": "washi",
         "dominantColor": "#8F662F"
       },
       {
-        "id": "pic2",
-        "src": "/assets/photos/pic2.jpg",
-        "alt": "Un plato a medias y la sobremesa.",
-        "caption": "la cena quemada",
+        "id": "memory-8",
+        "src": "/assets/photos/playita_001.jpg",
+        "alt": "Dias de playita",
+        "caption": "Playita",
         "rotation": 2.2,
         "accent": "clip",
         "dominantColor": "#75694C"
       },
       {
-        "id": "pic3",
-        "src": "/assets/photos/pic3.jpg",
-        "alt": "El horizonte, muy ancho, sin prisa.",
-        "caption": "y lo que viene",
+        "id": "memory-9",
+        "src": "/assets/photos/aeropuerto_001.jpg",
+        "alt": "Piurita",
+        "caption": "dias de aeropuerto",
+        "rotation": -0.9,
+        "accent": "petal",
+        "dominantColor": "#977E52"
+      },
+      {
+        "id": "memory-10",
+        "src": "/assets/photos/videollamadas_001.jpg",
+        "alt": "Videollamadas",
+        "caption": ":(",
+        "rotation": -0.9,
+        "accent": "petal",
+        "dominantColor": "#977E52"
+      },
+      {
+        "id": "memory-11",
+        "src": "/assets/photos/1111_001.jpg",
+        "alt": "fondo",
+        "caption": "Siempre mi 11:11",
         "rotation": -0.9,
         "accent": "petal",
         "dominantColor": "#977E52"
@@ -140,51 +177,80 @@
         "layout": "duo",
         "photos": [
           "memory-1",
-          "memory-2"
+          "pic_1"
         ],
         "title": "Cómo empezó",
         "text": "No hubo un momento exacto. Hubo una tarde, y luego otra, y para cuando quisimos darnos cuenta ya era esto."
       },
       {
         "id": "s2",
-        "layout": "hero",
+        "layout": "duo",
         "photos": [
+          "memory-2",
           "memory-3"
         ],
-        "title": "Tu cara",
-        "text": "Esta es la que miro cuando no estás."
+        "title": "Navidad",
+        "text": "Nuestras navidades en casita RP"
       },
       {
         "id": "s3",
-        "layout": "collage",
+        "layout": "hero",
         "photos": [
-          "memory-4",
-          "memory-5",
-          "pic1"
+          "memory-4"
         ],
-        "title": "Todo lo demás",
-        "text": "Los caminos largos, las manos, la risa. Lo que no cabe en una sola foto."
+        "title": "Comida",
+        "text": "Si hay comida siempre llegas, siempre"
+      },
+      {
+        "id": "s10",
+        "layout": "duo",
+        "photos": [
+          "memory-5",
+          "memory-6"
+        ],
+        "title": "UDEP",
+        "text": "sitios raros los de Udep, nos vamos a titular juntos."
       },
       {
         "id": "s4",
-        "layout": "note",
+        "layout": "duo",
         "photos": [
-          "memory-6",
-          "pic2"
+          "memory-7",
+          "memory-8"
         ],
-        "title": "Una nota",
-        "text": "Gracias por las cenas quemadas, por las ventanas, por quedarte cuando era más fácil irse. Gracias por hacer que un martes cualquiera valga la pena.",
+        "title": "Dias de Playita",
+        "text": "Dias de playita a tu lado, siempre me gusta",
         "signature": "siempre tuyo"
       },
       {
         "id": "s5",
+        "layout": "hero",
+        "photos": [
+          "memory-9"
+        ],
+        "title": "Algunas despedidas",
+        "text": "Algunas despedidas son más difíciles que otras",
+        "signature": "siempre nos juntaremos"
+      },
+      {
+        "id": "s7",
+        "layout": "note",
+        "photos": [
+          "memory-10"
+        ],
+        "title": "Distancia",
+        "text": "Nuestros días separados, pero siempre conectados",
+        "signature": "sabremos estar juntos a pesar de todo"
+      },
+      {
+        "id": "s6",
         "layout": "closing",
         "photos": [
-          "pic3"
+          "memory-11"
         ],
         "title": "Y lo que viene",
-        "text": "Feliz veintiuno de septiembre.",
-        "signature": "me quiere, siempre"
+        "text": "hoy mi 21-09 pero siempre mi 11:11",
+        "signature": "te quiere, siempre"
       }
     ]
   }

@@ -4,6 +4,12 @@
    ────────────────────────────────────────────────────────────────────── */
 
 :root {
+  /* Esquina en la que se apoya el album. El libro cerrado y el marco abierto
+     comparten este anclaje: al abrirse crece hacia la izquierda y hacia
+     arriba, sin moverse de sitio. */
+  --album-inset-x: clamp(20px, 3.4vw, 64px);
+  --album-inset-y: clamp(46px, 6vh, 74px);
+
   --night-deep: #1e2620;
   --night-mid: #2f3a2e;
   --glow-warm: #6b5a2e;
@@ -333,15 +339,14 @@ img {
 
 .album-panel {
   /* El tamano vive aqui: la sombra de apoyo es hermana del boton y lo lee. */
-  --w: 240px;
-  --h: 310px;
+  --w: 190px;
+  --h: 246px;
   position: absolute;
   z-index: 30;
   opacity: 0;
   animation: chrome-in 500ms ease-out 1950ms forwards;
-  left: 69%;
-  top: 60%;
-  transform: translate(-50%, -50%);
+  right: var(--album-inset-x);
+  bottom: var(--album-inset-y);
   display: flex;
   /* Las etiquetas van ARRIBA: por debajo del libro pasa la hoja frontal, y
      un texto cortado por una hoja se lee como un fallo, no como profundidad. */
@@ -541,11 +546,11 @@ img {
   inset: 0;
   z-index: 25;
   pointer-events: none;
-  background: linear-gradient(
-    to right,
-    transparent 52%,
-    rgba(20, 26, 20, 0.4) 78%,
-    rgba(20, 26, 20, 0.4) 100%
+  background: radial-gradient(
+    120% 110% at 88% 92%,
+    rgba(20, 26, 20, 0.46) 0%,
+    rgba(20, 26, 20, 0.3) 42%,
+    transparent 72%
   );
   opacity: 0;
   transition: opacity 300ms ease;
@@ -577,10 +582,10 @@ img {
 
 .album-frame {
   position: absolute;
-  /* Centrado estatico: solo se animan width y height, nunca este transform. */
-  left: 71%;
-  top: 52%;
-  transform: translate(-50%, -50%);
+  /* Anclado por la esquina inferior derecha: sin transform que animar, solo
+     width y height, y el libro crece hacia la izquierda y hacia arriba. */
+  right: var(--album-inset-x);
+  bottom: var(--album-inset-y);
   border-radius: 10px;
   background: var(--linen);
   box-shadow:
@@ -604,11 +609,12 @@ img {
 
 .album-proxy {
   position: absolute;
-  left: 71%;
-  top: 52%;
+  right: var(--album-inset-x);
+  bottom: var(--album-inset-y);
   /* Sale del angulo en que estaba apoyado y se pone de cara mientras crece:
      asi la apertura continua el gesto del hover en vez de cortarlo. */
-  transform: translate(-50%, -50%) perspective(1600px) rotateX(var(--lay, 0deg));
+  transform-origin: 100% 100%;
+  transform: perspective(1600px) rotateX(var(--lay, 0deg));
   border-radius: 10px;
   background: var(--linen);
   pointer-events: none;
@@ -1023,14 +1029,8 @@ img {
 
 @media (max-width: 1099px) and (min-width: 900px) {
   .album-panel {
-    left: 68%;
-    top: 61%;
-    --w: 206px;
-    --h: 266px;
-  }
-  .album-frame,
-  .album-proxy {
-    left: 70%;
+    --w: 168px;
+    --h: 218px;
   }
   .header-overlay {
     left: 26%;
@@ -1069,6 +1069,7 @@ img {
 
   .album-panel {
     left: 50%;
+    right: auto;
     top: auto;
     bottom: max(14px, env(safe-area-inset-bottom));
     transform: translateX(-50%);
@@ -1117,6 +1118,14 @@ img {
   .album-frame,
   .album-proxy {
     left: 50%;
+    right: auto;
+    bottom: 50%;
+    transform: translate(-50%, 50%);
+  }
+
+  .album-proxy {
+    transform: translate(-50%, 50%) perspective(1600px) rotateX(var(--lay, 0deg));
+    transform-origin: 50% 50%;
   }
 
   .album-scrim {
@@ -1319,7 +1328,9 @@ body[data-cursor='glow'] * {
 .cursor-layer {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  /* Por encima de todo, album abierto incluido (80). Es el puntero: si se
+     queda debajo de algo, esa zona se queda sin cursor. */
+  z-index: 9999;
   pointer-events: none;
   contain: strict;
 }
@@ -1347,6 +1358,37 @@ body[data-cursor='glow'] * {
 
 .cursor-glow[data-on='true'] {
   opacity: 1;
+}
+
+/**
+ * El nucleo. El halo calido solo se lee sobre el fondo oscuro; encima del
+ * papel del album se disuelve. Este punto lleva anillo oscuro y relleno
+ * claro, asi que hay contraste contra las dos superficies.
+ */
+.cursor-glow::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: rgba(255, 249, 229, 0.96);
+  box-shadow:
+    0 0 0 1.6px rgba(38, 30, 16, 0.55),
+    0 0 12px 3px rgba(255, 206, 110, 0.55);
+  transition: width 220ms ease, height 220ms ease;
+}
+
+.cursor-glow[data-state='pulling']::after {
+  width: 11px;
+  height: 11px;
+}
+
+.cursor-glow[data-state='ligule']::after {
+  width: 6px;
+  height: 6px;
 }
 
 /* La afordancia que perdia el cursor nativo, dicha con luz. */
@@ -1397,8 +1439,10 @@ body[data-cursor='glow'] * {
   height: 3px;
   border-radius: 50%;
   opacity: 0;
-  background: rgba(255, 236, 175, 0.95);
-  box-shadow: 0 0 6px 1px rgba(255, 206, 110, 0.7);
+  background: rgba(255, 240, 190, 0.98);
+  box-shadow:
+    0 0 0 0.8px rgba(46, 36, 18, 0.35),
+    0 0 7px 1px rgba(255, 206, 110, 0.75);
   will-change: transform, opacity;
 }
 

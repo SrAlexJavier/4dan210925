@@ -72,7 +72,7 @@ cabeza deja el tallo como un palo clavado.
 
 | z  | Elemento                    | pointer-events |
 |----|-----------------------------|----------------|
-| 200| `.cursor-layer` (resplandor)| none           |
+| 9999 | `.cursor-layer` (puntero) | none           |
 | 80 | `.album-anchor` (abierto)   | auto           |
 | 70 | Susurro de la flor          | none           |
 | 60 | AudioToggles, A11yMirror    | auto           |
@@ -83,8 +83,15 @@ cabeza deja el tallo como un palo clavado.
 | 10 | Capas de fondo (3)          | none           |
 
 El cursor del sistema se oculta (`body[data-cursor="glow"]`) solo cuando hay
-puntero fino; el resplandor cambia de tamaño y color según `data-hover`, que
-es lo que sustituye a los cursores `grab` / `pointer`.
+puntero fino con hover; el resplandor cambia de tamaño y color según
+`data-hover`, que es lo que sustituye a los cursores `grab` / `pointer`.
+
+`CursorGlow` y `AlbumPortal` van los dos por `createPortal(document.body)`.
+`#root` tiene `isolation: isolate`, así que crea contexto de apilamiento y
+ningún z-index de dentro puede pasar por encima del álbum: el puntero tiene
+que ser hermano suyo para verse sobre el libro abierto. Su núcleo lleva
+anillo oscuro y relleno claro para leerse igual sobre el fondo oscuro que
+sobre el papel del álbum.
 
 El canvas se pinta **encima** del álbum pero **escucha desde debajo**
 (`eventSource` apunta a `.stage`): por eso una hoja puede cruzar por delante
@@ -132,12 +139,20 @@ arranque un pétalo está en `usePointerGuard`.
 
 | Archivo            | Contiene                                        |
 |--------------------|-------------------------------------------------|
-| `AlbumPanel.tsx`   | El libro cerrado en su columna                  |
+| `AlbumPanel.tsx`   | El libro cerrado, anclado a la esquina inferior derecha |
 | `AlbumPortal.tsx`  | Apertura en tres fases, foco, teclado, swipe    |
 | `AlbumBook.tsx`    | El giro de página (Web Animations API)          |
 | `AlbumSpread.tsx`  | Reparto por maquetas y caras de la hoja         |
 | `Polaroid.tsx`     | Marco, `dominantColor`, adornos                 |
 | `spreads/*.tsx`    | Las cinco maquetas                              |
+
+## Anclaje del álbum
+
+`--album-inset-x` / `--album-inset-y` (en `:root`) son la esquina en la que
+se apoya el libro. El panel cerrado, el marco abierto y el proxy comparten
+ese anclaje por `right` / `bottom`, así que al abrirse solo se animan `width`
+y `height` y el libro crece hacia la izquierda y hacia arriba sin moverse de
+sitio. Por debajo de 900 px ese anclaje se sustituye por el dock centrado.
 
 ## Scripts
 
