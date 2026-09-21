@@ -64,7 +64,7 @@
     "photos": [
       {
         "id": "memory-1",
-        "src": "/assets/photos/viajes_001.jpg",
+        "src": "assets/photos/viajes_001.jpg",
         "alt": "Los dos, nuestras primeras fotos",
         "caption": "antes del principio",
         "date": "31/",
@@ -74,7 +74,7 @@
       },
       {
         "id": "pic_1",
-        "src": "/assets/photos/divertidos_003.jpg",
+        "src": "assets/photos/divertidos_003.jpg",
         "alt": "Los dos, nuestras primeras fotos",
         "caption": "en el pricipio",
         "date": "31/",
@@ -84,7 +84,7 @@
       },
       {
         "id": "memory-2",
-        "src": "/assets/photos/navidad_001.jpg",
+        "src": "assets/photos/navidad_001.jpg",
         "alt": "Nuestras primeras navidades.",
         "caption": "navidad",
         "rotation": 1.6,
@@ -93,7 +93,7 @@
       },
       {
         "id": "memory-3",
-        "src": "/assets/photos/navidad_002.jpg",
+        "src": "assets/photos/navidad_002.jpg",
         "alt": "siempre tú",
         "caption": "Rp y Layo casita",
         "rotation": -1.2,
@@ -102,7 +102,7 @@
       },
       {
         "id": "memory-4",
-        "src": "/assets/photos/comida_001.jpg",
+        "src": "assets/photos/comida_001.jpg",
         "alt": "Si es comida siempre llegas.",
         "rotation": 2.4,
         "accent": "washi",
@@ -110,7 +110,7 @@
       },
       {
         "id": "memory-5",
-        "src": "/assets/photos/universidad_001.jpg",
+        "src": "assets/photos/universidad_001.jpg",
         "alt": "Nuestros días en la UDEP bonita",
         "rotation": -2.8,
         "accent": "clip",
@@ -118,7 +118,7 @@
       },
       {
         "id": "memory-6",
-        "src": "/assets/photos/universidad_002.jpg",
+        "src": "assets/photos/universidad_002.jpg",
         "alt": "Sitios raros en la U.",
         "caption": "Sitios raros en Udep",
         "rotation": 1.1,
@@ -127,7 +127,7 @@
       },
       {
         "id": "memory-7",
-        "src": "/assets/photos/playa_001.png",
+        "src": "assets/photos/playa_001.png",
         "alt": "dias de playita",
         "caption": "Dias de playita",
         "rotation": -1.7,
@@ -136,7 +136,7 @@
       },
       {
         "id": "memory-8",
-        "src": "/assets/photos/playita_001.jpg",
+        "src": "assets/photos/playita_001.jpg",
         "alt": "Dias de playita",
         "caption": "Playita",
         "rotation": 2.2,
@@ -145,7 +145,7 @@
       },
       {
         "id": "memory-9",
-        "src": "/assets/photos/aeropuerto_001.jpg",
+        "src": "assets/photos/aeropuerto_001.jpg",
         "alt": "Piurita",
         "caption": "dias de aeropuerto",
         "rotation": -0.9,
@@ -154,7 +154,7 @@
       },
       {
         "id": "memory-10",
-        "src": "/assets/photos/videollamadas_001.jpg",
+        "src": "assets/photos/videollamadas_001.jpg",
         "alt": "Videollamadas",
         "caption": ":(",
         "rotation": -0.9,
@@ -163,7 +163,7 @@
       },
       {
         "id": "memory-11",
-        "src": "/assets/photos/1111_001.jpg",
+        "src": "assets/photos/1111_001.jpg",
         "alt": "fondo",
         "caption": "Siempre mi 11:11",
         "rotation": -0.9,
